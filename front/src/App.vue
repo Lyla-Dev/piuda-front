@@ -1,15 +1,20 @@
 <template>
-  <div>
-    <h1>Hello World</h1>
+  <div id="app">
+    <NavBar />
+    <router-view />
   </div>
-  
 </template>
 
 <script>
+import NavBar from './components/NavBar.vue'
 export default {
-  name: "App",
-};
+  components: { NavBar }
+}
 </script>
 
 <style>
+body {
+  margin: 0;
+  font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
+}
 </style>
