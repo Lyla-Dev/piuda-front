@@ -64,4 +64,4 @@ vite.svg
 # Misc
 *.local
 
-
+node_modules
