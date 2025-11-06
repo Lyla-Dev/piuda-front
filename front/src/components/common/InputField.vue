@@ -1,22 +1,4 @@
 <template>
-<<<<<<< HEAD
-  <div class="input-field">
-    <label v-if="label" class="label">
-      {{ label }}
-      <span v-if="required" class="req">*</span>
-    </label>
-
-    <component
-      :is="as === 'textarea' ? 'textarea' : 'input'"
-      class="control"
-      :type="as === 'textarea' ? undefined : type"
-      :rows="as === 'textarea' ? rows : undefined"
-      :placeholder="placeholder"
-      :name="name"
-      :required="required"
-      :value="modelValue"
-      @input="$emit('update:modelValue', $event.target.value)"
-=======
   <div style="display:flex; flex-direction:column; gap:6px;">
     <label v-if="label" style="font-weight:600; font-size:14px;">
       {{ label }} <span v-if="required" style="color:#e11d48">*</span>
@@ -28,47 +10,26 @@
       :value="modelValue"
       @input="$emit('update:modelValue', $event.target.value)"
       style="padding:8px 12px; border:1px solid #cbd5e1; border-radius:9999px; background:#f5f7fa; outline:none;"
->>>>>>> bd6fb0fccc19e1fefec95f8b269c47b6ffa1a05d
     />
   </div>
 </template>
 
-<script>
-export default {
-<<<<<<< HEAD
-  name: "InputField",
-  props: {
-    modelValue: [String, Number],
-    label: String,
-    as: { type: String, default: "input" },
-    type: { type: String, default: "text" },
-    placeholder: String,
-    name: String,
-    required: { type: Boolean, default: false },
-    rows: { type: Number, default: 3 },
-  },
-  emits: ["update:modelValue"],
-};
-</script>
+<script setup>
+// Vue 3 <script setup> 방식: defineProps와 defineEmits만 사용합니다.
 
-<style scoped>
-.input-field { display:flex; flex-direction:column; margin-bottom:16px; }
-.label { font-weight:600; margin-bottom:4px; }
-.req { color:#e11d48; margin-left:2px; }
-.control { padding:8px 10px; border:1px solid #d1d5db; border-radius:6px; font-size:14px; }
-.control:focus { outline:none; border-color:#2563eb; box-shadow:0 0 0 3px rgba(37,99,235,0.2); }
-</style>
-=======
-  name: 'InputField',
-  emits: ['update:modelValue'],
-  props: {
-    modelValue: { type: [String, Number], default: '' },
+// ActivityFormView.vue에서 사용된 모든 props를 여기에 정의합니다.
+defineProps({
+    modelValue: { type: [String, Number], default: '' }, // v-model을 위한 필수 prop
     label: String,
     required: Boolean,
     placeholder: String,
     type: { type: String, default: 'text' },
     disabled: Boolean,
-  },
-}
+    unit: String // 총 쓰레기 양 (무게), (부피)에 사용되는 prop
+});
+
+// v-model의 변경을 부모에게 전달하는 필수 emit 이벤트입니다.
+defineEmits(['update:modelValue']); 
+
+// 참고: unit prop을 사용하려면 <template>에서 unit 관련 UI (예: kg, L)도 추가해야 합니다.
 </script>
->>>>>>> bd6fb0fccc19e1fefec95f8b269c47b6ffa1a05d
