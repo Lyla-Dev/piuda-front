@@ -3,8 +3,8 @@ import MainView from '@/components/MainView/MainView.vue'
 import ActivityView from '@/components/ActivityView/ActivityView.vue'
 import MapView from '@/components/MapView/MapView.vue'
 import InfoView from '@/components/InfoView/InfoView.vue'
-import LoginView from '@/components/LoginView/LoginView.vue'
-import ReviewList from '@/pages/ReviewList.vue'
+import LoginView from '@/components/ActivityView/LoginView.vue'
+import ReviewList from '@/components/ActivityView/ReviewList.vue'
 
 const routes = [
   { path: '/', name: 'Home', component: MainView },

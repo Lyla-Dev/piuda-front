@@ -45,7 +45,7 @@
 
 <script>
 // 경로: pages/LoginView.vue에서 components/common/InputField.vue로 접근
-import InputField from '../components/common/InputField.vue';
+import InputField from '../common/InputField.vue';
 
 export default {
   name: 'LoginView',
