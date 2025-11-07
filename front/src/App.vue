@@ -14,12 +14,12 @@
 
 <script>
 import NavBar from './components/NavBar.vue'
-import ActivityFormView from './pages/ActivityFormView.vue'
+// import ActivityFormView from './pages/ActivityFormView.vue'
 
 export default {
   components: {
-    NavBar,
-    ActivityFormView
+    NavBar
+    // ActivityFormView 
   }
 }
 </script>
