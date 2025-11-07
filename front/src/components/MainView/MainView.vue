@@ -1,30 +1,49 @@
 <template>
-  <div class="main-page">
-    <!-- Hero Section -->
-    <section class="hero">
-      <div class="overlay">
-        <div class="text-group">
-          <p class="hero-sub">우리 바다를 살리는 전국 해양보호단체 협의체</p>
-          <h1 class="hero-title">바다살리기네트워크</h1>
+  <section class="hero">
+    <img src="@/assets/main_pic.png" alt="main" class="hero-bg" />
+    <div class="overlay">
+      <div class="text-group">
+        <p class="hero-sub">우리 바다를 살리는 전국 해양보호단체 협의체</p>
+        <h1 class="hero-title">바다살리기네트워크</h1>
+      </div>
+    </div>
+  </section>
+
+<!-- Mission Section -->
+<section class="mission">
+  <div class="mission-container">
+    <!-- 왼쪽 텍스트 -->
+    <div class="mission-text">
+      <h2>바다를 살리는 한 걸음</h2>
+      <p>
+        바다살리기네트워크는 해양 생태계와<br />
+        생물 다양성 보호를 위해 노력하고 있습니다.<br />
+        작은 행동이 일으키는 변화의 물결에<br />
+        함께 해보아요
+      </p>
+    </div>
+
+    <!-- 오른쪽 버튼 2x2 -->
+    <div class="mission-buttons">
+      <button @click="$router.push('/report')">
+        해양쓰레기<br />제보하기
+      </button>
+
+      <button @click="$router.push('/activity-list')">
+        활동<br />참가하기
+      </button>
+
+      <button @click="$router.push('/map')">
+        해양지도<br />바로가기
+      </button>
+
+      <button @click="$router.push('/activity-form')">
+        활동 후기<br />작성하기
+      </button>
         </div>
       </div>
     </section>
 
-    <!-- Mission Section -->
-    <section class="mission">
-      <h2>바다를 살리는 한 걸음</h2>
-      <p>
-        바다살리기네트워크는 해양 생태계와 생물 다양성 보호를 위해 노력하고 있습니다.<br />
-        각운 행동이 일으키는 변화의 물결에 함께 해보아요.
-      </p>
-
-      <div class="button-group">
-        <button>해양쓰레기 제보하기</button>
-        <button>활동 참가하기</button>
-        <button>해양지도 바로가기</button>
-        <button>활동 후기 작성하기</button>
-      </div>
-    </section>
 
     <!-- Activity Section -->
     <section class="activity">
@@ -52,30 +71,28 @@
       </div>
     </section>
 
-    <!-- Partner Section -->
     <section class="partners">
       <h2>바다살리기네트워크 소속 단체</h2>
-      <div class="partner-list">
-        <div class="partner-item">
-          <img src="@/assets/teambooster.png" alt="Team Booster" />
-          <p>팀부스터 | 동해</p>
+
+      <div class="carousel">
+        <!-- 왼쪽 화살표 -->
+        <button class="nav prev" @click="prevSlide">‹</button>
+
+        <div class="carousel-window">
+          <div class="carousel-track" :style="trackStyle">
+            <div
+              class="partner-item"
+              v-for="(partner, index) in partners"
+              :key="index"
+            >
+              <img :src="partner.img" :alt="partner.name" />
+              <p>{{ partner.name }}</p>
+            </div>
+          </div>
         </div>
-        <div class="partner-item">
-          <img src="@/assets/bgzjeju.png" alt="봉그젠 제주" />
-          <p>봉그젠 | 제주</p>
-        </div>
-        <div class="partner-item">
-          <img src="@/assets/dipda.png" alt="디프다 제주" />
-          <p>디프다제주 | 제주</p>
-        </div>
-        <div class="partner-item">
-          <img src="@/assets/jejubarid.png" alt="제주바당 제주" />
-          <p>제주바당 | 제주</p>
-        </div>
-        <div class="partner-item">
-          <img src="@/assets/ssodam.png" alt="쓰담 속초" />
-          <p>쓰담속초 | 동해</p>
-        </div>
+
+        <!-- 오른쪽 화살표 -->
+        <button class="nav next" @click="nextSlide">›</button>
       </div>
     </section>
 
@@ -89,8 +106,48 @@
         Copyright ⓒ 2025 바다살리기네트워크 All rights reserved.
       </p>
     </footer>
-  </div>
 </template>
+
+<script setup>
+import { ref, computed, onMounted, onBeforeUnmount } from "vue";
+
+const partners = [
+  { img: require("@/assets/teambooster.png"), name: "팀부스터 | 동해" },
+  { img: require("@/assets/bgzjeju.png"), name: "봉그젠 | 제주" },
+  { img: require("@/assets/dipda.png"), name: "디프다제주 | 제주" },
+  { img: require("@/assets/jejubarid.png"), name: "제주바당 | 제주" },
+  { img: require("@/assets/ssodam.png"), name: "쓰담속초 | 동해" },
+];
+
+const currentIndex = ref(0);
+// const visibleCount = 3; // 한 화면에 보이는 카드 개수
+const slideWidth = 240; // 각 카드의 가로 폭(px)
+
+const trackStyle = computed(() => ({
+  transform: `translateX(-${currentIndex.value * slideWidth}px)`,
+  transition: "transform 0.6s ease",
+}));
+
+function nextSlide() {
+  currentIndex.value =
+    (currentIndex.value + 1) % partners.length;
+}
+
+function prevSlide() {
+  currentIndex.value =
+    (currentIndex.value - 1 + partners.length) % partners.length;
+}
+
+/* 자동 슬라이드 */
+let autoSlideInterval;
+onMounted(() => {
+  autoSlideInterval = setInterval(nextSlide, 3000);
+});
+onBeforeUnmount(() => {
+  clearInterval(autoSlideInterval);
+});
+</script>
+
 
 <style scoped>
 .main-page {
@@ -100,21 +157,35 @@
 
 /* Hero Section */
 .hero {
-  width: 100%;
-  height: 80vh;
-  background: url("@/assets/main_pic.png") center/cover no-repeat;
   position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
 }
-.overlay {
-  background: rgba(0, 0, 0, 0.4);
+
+.hero-bg {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: white;
-  text-align: center;
+  object-fit: cover;
+  object-position: center;
 }
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.text-group {
+  position: absolute;
+  bottom: 8%;
+  right: 6%;
+  color: white;
+  text-align: right;
+}
+
 .hero-sub {
   font-size: 1rem;
   opacity: 0.9;
@@ -125,42 +196,78 @@
   margin-top: 0.5rem;
 }
 
-/* Mission Section */
 .mission {
-  text-align: center;
-  padding: 4rem 1rem;
   background-color: #f6f8ff;
   border-radius: 40px 40px 0 0;
-  margin-top: -3rem;
+  padding: 4rem 2rem;
+  display: flex;
+  justify-content: center;
 }
-.mission h2 {
+
+/* 내부 컨테이너: 텍스트 + 버튼 나란히 */
+.mission-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 1000px;
+  flex-wrap: wrap;
+  margin: 0 auto; /* ✅ 중앙 정렬 */
+}
+
+/* 왼쪽 텍스트 영역 */
+.mission-text {
+  flex: 1;
+  min-width: 260px;
+}
+.mission-text h2 {
   font-size: 1.8rem;
   color: #16236a;
   margin-bottom: 1rem;
 }
-.mission p {
+.mission-text p {
   color: #555;
   line-height: 1.7;
-  margin-bottom: 2rem;
 }
-.button-group {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+
+/* 오른쪽 버튼 영역 */
+.mission-buttons {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* ✅ 2열 */
   gap: 1rem;
+  justify-items: center;
+  min-width: 320px;
 }
-.button-group button {
-  background: white;
-  border: 2px solid #8ea2ff;
+
+/* 버튼 스타일 */
+.mission-buttons button {
+  background: #f8faff;
+  border: 2px solid #1a2b6d;
   color: #1a2b6d;
-  padding: 0.75rem 1.5rem;
+  padding: 1rem;
+  width: 180px;
+  height: 110px;
   border-radius: 12px;
   cursor: pointer;
   font-weight: 600;
+  font-size: 1rem;
+  text-align: center;
   transition: 0.3s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
-.button-group button:hover {
+.mission-buttons button:hover {
   background: #e3e9ff;
+}
+
+/* 아이콘 */
+.mission-buttons img {
+  width: 32px;
+  height: 32px;
+  margin-bottom: 0.5rem;
 }
 
 /* Activity Section */
@@ -203,36 +310,88 @@
   color: #777;
 }
 
-/* Partner Section */
 .partners {
   padding: 4rem 1.5rem;
   background-color: #f8faff;
-  text-align: center;
+  text-align: left;
+  overflow: hidden; /* 추가: 화살표가 나가도 가로 스크롤 안 생기게 */
 }
+
 .partners h2 {
   color: #16236a;
   font-size: 1.5rem;
   margin-bottom: 2rem;
 }
-.partner-list {
+
+.carousel {
+  position: relative;
   display: flex;
-  flex-wrap: wrap;
+  align-items: center;
   justify-content: center;
-  gap: 2rem;
+  max-width: 1150px;
+  margin: 0 auto;
 }
+
+/* 표시창 */
+.carousel-window {
+  width: 100%;
+  overflow: hidden;
+}
+
+/* 트랙 */
+.carousel-track {
+  display: flex;
+  gap: 1.5rem;
+}
+
+/* 개별 카드 */
 .partner-item {
-  width: 120px;
+  flex: 0 0 220px;
+  text-align: center;
+  background: white;
+  border-radius: 16px;
+  padding: 0.5rem;
 }
 .partner-item img {
-  width: 100%;
-  border-radius: 16px;
-  background-color: white;
-  padding: 0.5rem;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  width: 90%;
+  border-radius: 12px;
 }
 .partner-item p {
   margin-top: 0.5rem;
   font-size: 0.9rem;
+}
+
+/* 화살표 버튼 */
+.nav {
+  background: transparent;
+  border: none;
+  font-size: 3rem;
+  cursor: pointer;
+  color: #000000;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.3s;
+  z-index: 2;
+}
+
+.prev {
+  position: absolute;
+  left: -70px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.next {
+  position: absolute;
+  right: -70px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.nav:hover {
+  background: #e3e9ff;
 }
 
 /* Footer */
