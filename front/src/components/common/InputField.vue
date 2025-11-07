@@ -1,8 +1,7 @@
 <template>
-<<<<<<< HEAD
   <div class="input-field">
     <label v-if="label" class="label">
-      {{ label }}
+      {{ label }} 
       <span v-if="required" class="req">*</span>
     </label>
 
@@ -14,61 +13,87 @@
       :placeholder="placeholder"
       :name="name"
       :required="required"
-      :value="modelValue"
-      @input="$emit('update:modelValue', $event.target.value)"
-=======
-  <div style="display:flex; flex-direction:column; gap:6px;">
-    <label v-if="label" style="font-weight:600; font-size:14px;">
-      {{ label }} <span v-if="required" style="color:#e11d48">*</span>
-    </label>
-    <input
-      :type="type"
-      :placeholder="placeholder"
       :disabled="disabled"
       :value="modelValue"
       @input="$emit('update:modelValue', $event.target.value)"
-      style="padding:8px 12px; border:1px solid #cbd5e1; border-radius:9999px; background:#f5f7fa; outline:none;"
->>>>>>> bd6fb0fccc19e1fefec95f8b269c47b6ffa1a05d
     />
   </div>
 </template>
 
 <script>
 export default {
-<<<<<<< HEAD
   name: "InputField",
+  // 컴포넌트에서 발생하는 이벤트를 명시합니다.
+  emits: ["update:modelValue"], 
   props: {
-    modelValue: [String, Number],
+    // v-model을 위한 필수 prop
+    modelValue: [String, Number], 
+    
+    // 라벨 텍스트
     label: String,
-    as: { type: String, default: "input" },
-    type: { type: String, default: "text" },
+    
+    // 렌더링할 태그 (input 또는 textarea)
+    as: { type: String, default: "input" }, 
+    
+    // input type (text, email, password 등)
+    type: { type: String, default: "text" }, 
+    
+    // placeholder 텍스트
     placeholder: String,
+    
+    // HTML name 속성
     name: String,
-    required: { type: Boolean, default: false },
-    rows: { type: Number, default: 3 },
+    
+    // 필수 입력 여부
+    required: { type: Boolean, default: false }, 
+    
+    // 입력 비활성화 여부 (두 번째 버전에서 추가됨)
+    disabled: { type: Boolean, default: false },
+    
+    // textarea일 경우 행 수
+    rows: { type: Number, default: 3 }, 
   },
-  emits: ["update:modelValue"],
 };
 </script>
 
 <style scoped>
-.input-field { display:flex; flex-direction:column; margin-bottom:16px; }
-.label { font-weight:600; margin-bottom:4px; }
-.req { color:#e11d48; margin-left:2px; }
-.control { padding:8px 10px; border:1px solid #d1d5db; border-radius:6px; font-size:14px; }
-.control:focus { outline:none; border-color:#2563eb; box-shadow:0 0 0 3px rgba(37,99,235,0.2); }
-</style>
-=======
-  name: 'InputField',
-  emits: ['update:modelValue'],
-  props: {
-    modelValue: { type: [String, Number], default: '' },
-    label: String,
-    required: Boolean,
-    placeholder: String,
-    type: { type: String, default: 'text' },
-    disabled: Boolean,
-  },
+/* 첫 번째 버전의 깔끔한 CSS 스타일을 사용합니다. */
+.input-field { 
+    display:flex; 
+    flex-direction:column; 
+    gap: 6px; /* 두 번째 버전의 간격 스타일 추가 */
+    margin-bottom:16px; 
 }
-</script>
->>>>>>> bd6fb0fccc19e1fefec95f8b269c47b6ffa1a05d
+
+.label { 
+    font-weight:600; 
+    font-size:14px; /* 두 번째 버전의 폰트 사이즈 추가 */
+}
+
+.req { 
+    color:#e11d48; 
+    margin-left:2px; 
+}
+
+.control { 
+    padding:8px 12px; /* 두 번째 버전의 패딩으로 변경 */
+    border:1px solid #d1d5db; 
+    border-radius:9999px; /* 두 번째 버전처럼 둥근 스타일로 변경 */
+    font-size:14px; 
+    background:#f5f7fa; /* 두 번째 버전의 배경색 추가 */
+    outline:none;
+    transition: all 0.2s; /* 부드러운 전환 효과 추가 */
+}
+
+.control:focus { 
+    border-color:#2563eb; 
+    box-shadow:0 0 0 3px rgba(37,99,235,0.2); 
+}
+
+/* textarea는 둥근 모서리 대신 사각형을 유지하는 것이 일반적입니다. */
+textarea.control {
+    border-radius: 6px;
+    min-height: 80px;
+    resize: vertical;
+}
+</style>
