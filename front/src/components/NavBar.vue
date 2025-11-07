@@ -28,14 +28,14 @@
               <router-link to="/report">해양 쓰레기 제보</router-link>
             </li>
             <li>
-              <router-link to="/activity-board">활동 후기 게시판</router-link>
+              <router-link to="/review-list">활동 후기 게시판</router-link>
             </li>
           </ul>
         </transition>
       </li>
 
       <li><router-link to="/map">해양 지도</router-link></li>
-      <li><router-link to="/notice">공지</router-link></li>
+      <li><router-link to="/info">공지</router-link></li>
     </ul>
 
     <!-- 로그인 버튼 -->
