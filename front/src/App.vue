@@ -5,6 +5,7 @@
 </template>
 
 <script>
+// import NavBar from './components/NavBar.vue'
 import ActivityFormView from './components/ActivityView/ActivityFormView.vue'; 
 
 export default {

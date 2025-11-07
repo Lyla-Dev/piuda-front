@@ -11,11 +11,12 @@ module.exports = {
     // 'vue/setup-compiler-macros' 
   ],
   parserOptions: {
-    parser: '@babel/eslint-parser'
+    parser: "@babel/eslint-parser",
+    requireConfigFile: false,
+    ecmaVersion: 2020,
+    sourceType: "module"
   },
-  // ⭐️⭐️⭐️ 이 부분을 추가합니다: ⭐️⭐️⭐️
   globals: {
-    // Vue 3 <script setup> 매크로를 전역 변수로 등록하여 ESLint 에러를 방지합니다.
     defineProps: 'readonly',
     defineEmits: 'readonly',
     defineExpose: 'readonly',
