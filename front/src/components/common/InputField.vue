@@ -59,10 +59,10 @@ defineEmits(['update:modelValue']);
 
 .control { 
   padding:8px 12px;
-  border:1px solid #d1d5db; 
+  border:1px solid #8C8C8C; 
   border-radius:9999px;
   font-size:14px;
-  background:#f5f7fa;
+  background:white;
   outline:none;
   transition:all 0.2s;
 }
