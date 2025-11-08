@@ -1,11 +1,33 @@
 <template>
   <section class="hero">
-    <img src="@/assets/main_pic.png" alt="main" class="hero-bg" />
-    <div class="overlay">
-      <div class="text-group">
-        <p class="hero-sub">우리 바다를 살리는 전국 해양보호단체 협의체</p>
-        <h1 class="hero-title">바다살리기네트워크</h1>
+    <!-- 이미지 슬라이드 -->
+    <div class="hero-slider">
+      <div 
+        v-for="(slide, index) in heroSlides" 
+        :key="index"
+        class="hero-slide"
+        :class="{ active: currentSlide === index }"
+      >
+        <img :src="slide.image" :alt="slide.title" class="hero-bg" />
+        <div class="overlay">
+          <div class="text-group">
+            <p class="hero-sub">우리 바다를 살리는 전국 해양보호단체 협의체</p>
+            <h1 class="hero-title">바다살리기네트워크</h1>
+            <h2 class="hero-message">{{ slide.message }}</h2>
+          </div>
+        </div>
       </div>
+    </div>
+    
+    <!-- 슬라이드 인디케이터 -->
+    <div class="slide-indicators">
+      <button 
+        v-for="(slide, index) in heroSlides" 
+        :key="index"
+        class="indicator"
+        :class="{ active: currentSlide === index }"
+        @click="goToSlide(index)"
+      ></button>
     </div>
   </section>
 
@@ -26,19 +48,23 @@
     <!-- 오른쪽 버튼 2x2 -->
     <div class="mission-buttons">
       <button @click="$router.push('/report')">
-        해양쓰레기<br />제보하기
+        <img src="@/assets/report.png" alt="제보하기" class="button-icon" />
+        <span class="button-text">해양쓰레기<br />제보하기</span>
       </button>
 
       <button @click="$router.push('/activity-list')">
-        활동<br />참가하기
+        <img src="@/assets/activitylist.png" alt="활동참가" class="button-icon" />
+        <span class="button-text">활동<br />참가하기</span>
       </button>
 
       <button @click="$router.push('/map')">
-        해양지도<br />바로가기
+        <img src="@/assets/map.png" alt="해양지도" class="button-icon" />
+        <span class="button-text">해양지도<br />바로가기</span>
       </button>
 
       <button @click="$router.push('/review-form')">
-        활동 후기<br />작성하기
+        <img src="@/assets/reviewform.png" alt="후기작성" class="button-icon" />
+        <span class="button-text">활동 후기<br />작성하기</span>
       </button>
         </div>
       </div>
@@ -111,6 +137,42 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from "vue";
 
+// 히어로 슬라이드 데이터
+const heroSlides = [
+  { 
+    image: require("@/assets/1.png"), 
+    message: "기록은 흔적이 아니라, 영향력이다.",
+    title: "slide1"
+  },
+  { 
+    image: require("@/assets/2.png"), 
+    message: "활동을 남기면, 변화가 시작된다.",
+    title: "slide2"
+  },
+  { 
+    image: require("@/assets/3.png"), 
+    message: "데이터는 노력의 증거이고, 영향력의 시작이다.",
+    title: "slide3"
+  },
+  { 
+    image: require("@/assets/4.png"), 
+    message: "노력을 남기고, 변화를 만든다.",
+    title: "slide4"
+  },
+  { 
+    image: require("@/assets/5.png"), 
+    message: "기록이 쌓이면, 세상이 움직인다.",
+    title: "slide5"
+  },
+  { 
+    image: require("@/assets/6.png"), 
+    message: "활동은 순간이지만, 데이터는 증거다.",
+    title: "slide6"
+  }
+];
+
+const currentSlide = ref(0);
+
 const partners = [
   { img: require("@/assets/teambooster.png"), name: "팀부스터 | 동해" },
   { img: require("@/assets/bgzjeju.png"), name: "봉그젠 | 제주" },
@@ -128,6 +190,15 @@ const trackStyle = computed(() => ({
   transition: "transform 0.6s ease",
 }));
 
+// 히어로 슬라이드 함수들
+function nextHeroSlide() {
+  currentSlide.value = (currentSlide.value + 1) % heroSlides.length;
+}
+
+function goToSlide(index) {
+  currentSlide.value = index;
+}
+
 function nextSlide() {
   currentIndex.value =
     (currentIndex.value + 1) % partners.length;
@@ -140,11 +211,19 @@ function prevSlide() {
 
 /* 자동 슬라이드 */
 let autoSlideInterval;
+let heroAutoSlideInterval;
+
 onMounted(() => {
+  // 파트너 슬라이드 자동 진행
   autoSlideInterval = setInterval(nextSlide, 3000);
+  
+  // 히어로 슬라이드 자동 진행 (4초마다)
+  heroAutoSlideInterval = setInterval(nextHeroSlide, 4000);
 });
+
 onBeforeUnmount(() => {
   clearInterval(autoSlideInterval);
+  clearInterval(heroAutoSlideInterval);
 });
 </script>
 
@@ -161,6 +240,27 @@ onBeforeUnmount(() => {
   width: 100%;
   height: 100vh;
   overflow: hidden;
+}
+
+/* 히어로 슬라이더 */
+.hero-slider {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.hero-slide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 0.8s ease-in-out;
+}
+
+.hero-slide.active {
+  opacity: 1;
 }
 
 .hero-bg {
@@ -181,19 +281,61 @@ onBeforeUnmount(() => {
 .text-group {
   position: absolute;
   bottom: 8%;
-  right: 6%;
+  left: 6%;
   color: white;
-  text-align: right;
+  text-align: left;
+}
+
+/* 슬라이드 인디케이터 */
+.slide-indicators {
+  position: absolute;
+  bottom: 3%;
+  right: 6%;
+  display: flex;
+  gap: 0.5rem;
+  z-index: 10;
+}
+
+.indicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.4);
+  border: none;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.indicator.active {
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.indicator:hover {
+  background: rgba(255, 255, 255, 0.7);
 }
 
 .hero-sub {
   font-size: 1rem;
   opacity: 0.9;
+  margin: 0 0 0.5rem 0;
+  color: white;
 }
+
 .hero-title {
   font-size: 2.4rem;
   font-weight: 700;
-  margin-top: 0.5rem;
+  margin: 0 0 1.5rem 0;
+  color: white;
+}
+
+.hero-message {
+  font-size: 2.2rem;
+  font-weight: 600;
+  margin: 0;
+  color: white;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+  opacity: 0.95;
 }
 
 .mission {
@@ -210,64 +352,80 @@ onBeforeUnmount(() => {
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  max-width: 1000px;
+  max-width: 1200px;
   flex-wrap: wrap;
-  margin: 0 auto; /* ✅ 중앙 정렬 */
+  margin: 0 auto;
+  gap: 3rem;
 }
 
 /* 왼쪽 텍스트 영역 */
 .mission-text {
-  flex: 1;
+  flex: 0 0 350px;
   min-width: 260px;
+  margin-right: -2rem;
+  padding-left: 3rem;
 }
 .mission-text h2 {
-  font-size: 1.8rem;
+  font-size: 2rem;
   color: #16236a;
   margin-bottom: 1rem;
 }
 .mission-text p {
   color: #555;
+  font-size: 1.1rem;
   line-height: 1.7;
 }
 
 /* 오른쪽 버튼 영역 */
 .mission-buttons {
-  flex: 1;
+  flex: 0 0 500px;
   display: grid;
-  grid-template-columns: repeat(2, 1fr); /* ✅ 2열 */
-  gap: 1rem;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem;
   justify-items: center;
-  min-width: 320px;
 }
 
 /* 버튼 스타일 */
 .mission-buttons button {
-  background: #f8faff;
+  background: #f0f2f5;
   border: 2px solid #1a2b6d;
-  color: #1a2b6d;
-  padding: 1rem;
-  width: 180px;
-  height: 110px;
-  border-radius: 12px;
+  color: #374151;
+  padding: 1.5rem;
+  width: 240px;
+  height: 130px;
+  border-radius: 16px;
   cursor: pointer;
-  font-weight: 600;
-  font-size: 1rem;
-  text-align: center;
+  font-weight: 700;
+  font-size: 1.4rem;
   transition: 0.3s;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
+  gap: 1.2rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 .mission-buttons button:hover {
-  background: #e3e9ff;
+  background: #e5e7eb;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
-/* 아이콘 */
-.mission-buttons img {
-  width: 32px;
-  height: 32px;
-  margin-bottom: 0.5rem;
+/* 버튼 아이콘 */
+.button-icon {
+  width: 64px;
+  height: 64px;
+  flex-shrink: 0;
+  object-fit: contain;
+}
+
+/* 버튼 텍스트 */
+.button-text {
+  flex: 1;
+  text-align: center;
+  line-height: 1.2;
+  font-weight: 700;
+  color: #1f2937;
 }
 
 /* Activity Section */
