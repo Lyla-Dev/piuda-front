@@ -1,31 +1,33 @@
 <template>
   <div id="app">
-    <!-- 상단 네비게이션 -->
-    <NavBar />
-
-    <!-- 라우터 뷰 -->
-    <router-view />
-
-    <!-- 직접 ActivityFormView를 렌더링하고 싶을 때 사용 -->
-    <!-- 필요할 경우 주석 해제 -->
-    <!-- <ActivityFormView /> -->
+    <ActivityFormView /> 
   </div>
 </template>
 
 <script>
-import NavBar from './components/NavBar.vue'
-
+// import NavBar from './components/NavBar.vue'
+import ActivityFormView from './components/ActivityView/ActivityFormView.vue'; 
 
 export default {
+  name: 'App',
   components: {
-    NavBar
+    ActivityFormView
   }
 }
 </script>
 
 <style>
-body {
+/* App.vue의 전역 스타일 */
+#app {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: #2c3e50;
+  /* ActivityFormView가 가운데 정렬되도록 전역 스타일을 조정합니다. */
+  text-align: center; 
+  min-height: 100vh;
+  padding: 0;
   margin: 0;
-  font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
+  /* background-color를 App.vue에서 설정하면 ActivityFormView의 배경색이 덮어쓰기 될 수 있어 생략합니다. */
 }
 </style>
