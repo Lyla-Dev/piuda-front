@@ -37,7 +37,7 @@
         해양지도<br />바로가기
       </button>
 
-      <button @click="$router.push('/activity-form')">
+      <button @click="$router.push('/review-form')">
         활동 후기<br />작성하기
       </button>
         </div>

@@ -5,8 +5,8 @@ import InfoView from '@/components/InfoView/InfoView.vue'
 import IntroView from '@/components/IntroView/IntroView.vue'
 import ReportView from "@/components/ActivityView/ReportView.vue";
 import ActivityList from "@/components/ActivityView/ActivityList.vue";
-import ActivityForm from "@/pages/ActivityFormView.vue"
-import LoginView from '@/components/ActivityView/LoginView.vue'
+import ReviewForm from "@/components/ActivityView/ReviewFormView.vue"
+import LoginView from '@/components/LoginView/LoginView.vue'
 import ReviewList from '@/components/ActivityView/ReviewList.vue'
 
 const routes = [
@@ -17,7 +17,7 @@ const routes = [
   { path: '/login', name: 'Login', component: LoginView },
   { path: '/report', name: 'Report', component: ReportView },
   { path: '/activity-list', name: 'ActivityList', component: ActivityList}, 
-  { path: '/activity-form', name: 'ActivityForm', component: ActivityForm },
+  { path: '/review-form', name: 'ReviewForm', component: ReviewForm },
   { path: '/review-list', name: 'ReviewList', component: ReviewList }
 ]
 
