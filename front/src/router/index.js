@@ -3,11 +3,11 @@ import MainView from '@/components/MainView/MainView.vue'
 import MapView from '@/components/MapView/MapView.vue'
 import InfoView from '@/components/InfoView/InfoView.vue'
 import IntroView from '@/components/IntroView/IntroView.vue'
-import LoginView from '@/pages/LoginView.vue'
 import ReportView from "@/components/ActivityView/ReportView.vue";
 import ActivityList from "@/components/ActivityView/ActivityList.vue";
 import ActivityForm from "@/pages/ActivityFormView.vue"
-import ReviewList from "@/pages/ReviewList.vue"
+import LoginView from '@/components/ActivityView/LoginView.vue'
+import ReviewList from '@/components/ActivityView/ReviewList.vue'
 
 const routes = [
   { path: '/', name: 'Home', component: MainView },
