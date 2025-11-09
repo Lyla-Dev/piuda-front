@@ -1,294 +1,395 @@
 <template>
-  <div class="form-wrapper">
-    
-    <!-- ⭐️ [수정] 페이지 최상단 제목을 추가했습니다. ⭐️ -->
-    <h1 class="page-header">해양 쓰레기 수거 활동 후기</h1>
-    
-    <!-- 1. 인원 정보 섹션: 3열 레이아웃 적용 -->
-    <section class="section-card">
-      <h3 class="section-title">인원 정보</h3>
-      
-      <!-- [수정] 3열 레이아웃을 위해 input-group-triple로 묶었습니다. -->
-      <div class="input-group-triple">
-        <InputField label="작성자" v-model="form.writer" required placeholder="홍길동" />
-        <InputField label="활동인원 수" v-model="form.count" required type="number" placeholder="0명" />
-        <InputField label="단체명" v-model="form.groupname" placeholder="단체/동아리 이름" />
+  <div class="page">
+    <h1 class="page-title">해양 쓰레기 수거 활동 후기</h1>
+
+    <!-- 인원 정보 -->
+    <section class="card">
+      <h2 class="card-title">인원 정보</h2>
+      <div class="grid grid-3">
+        <InputField v-model="form.writer" label="작성자" required placeholder="김OO" />
+        <InputField v-model="form.memberCount" label="활동인원 수" type="number" unit="명" required />
+        <InputField v-model="form.org" label="단체명" required placeholder="단체명" />
       </div>
-      
-      <!-- 활동 제목은 아래에 단독으로 배치 -->
-      <div class="input-group">
-        <InputField label="활동 제목" v-model="form.title" required placeholder="예: 제주바당" />
-      </div>
+      <InputField v-model="form.title" label="활동 제목" required placeholder="예: 고성 공경리 해변 정화" />
     </section>
 
-    <!-- 2. 활동 위치 및 시간 섹션 -->
-    <section class="section-card">
-      <h3 class="section-title">활동 위치 및 시간</h3>
-      
-      <div class="input-group">
-        <label class="input-label required">활동 날짜 *</label>
-        <select class="custom-select" v-model="form.date">
-          <option value="">날짜 및 시간 선택</option>
-          <option value="2025-11-05">2025-11-05</option>
-        </select>
-      </div>
+    <!-- 활동 위치 및 시간 -->
+    <section class="card">
+      <h2 class="card-title">활동 위치 및 시간</h2>
 
-      <div class="input-group">
-        <label class="input-label">활동 위치 *</label>
-        <div class="map-placeholder">
-            지도 영역
+      <div class="grid grid-2">
+        <div>
+          <label class="label">활동 날짜</label>
+          <select v-model="form.date" class="select">
+            <option disabled value="">연도-월-일</option>
+            <option v-for="d in dateOptions" :key="d" :value="d">{{ d }}</option>
+          </select>
         </div>
-        <p class="map-coords">좌표: (130.0000, 12323)</p>
+
+        <InputField v-model="form.placeName" label="활동 위치*" placeholder="예: 공경리 해변" required />
       </div>
 
-      <div class="input-group">
-        <InputField label="상세 위치" v-model="form.detailLocation" placeholder="예: 고성 공원리 해변 일대" />
+      <!-- 지도 자리 (추후 지도 SDK로 교체) -->
+      <div class="map">
+        <div class="map-placeholder">지도 영역 (SDK 연동 예정)</div>
       </div>
+
+      <p class="coords">좌표: ({{ coords.lng.toFixed(4) }}, {{ coords.lat.toFixed(4) }})</p>
+
+      <InputField
+        v-model="form.detailAddress"
+        as="textarea"
+        label="상세 위치"
+        placeholder="예: 고성 공경리 해변 입구"
+        rows="2"
+      />
     </section>
 
-    <!-- 3. 쓰레기 정보 섹션 -->
-    <section class="section-card">
-      <h3 class="section-title">쓰레기 정보</h3>
-      
-      <!-- 2열 레이아웃은 input-group-inline로 유지 -->
-      <div class="input-group-inline">
-        <InputField label="총 쓰레기 양 (무게)" v-model="form.weight" placeholder="0" unit="kg" />
-        <InputField label="총 쓰레기 양 (부피)" v-model="form.volume" placeholder="0" unit="L" />
+    <!-- 쓰레기 정보 -->
+    <section class="card">
+      <h2 class="card-title">쓰레기 정보</h2>
+
+      <div class="grid grid-3">
+        <InputField v-model="form.totalWeight" label="총 쓰레기 양" type="number" unit="kg" placeholder="무게" />
+        <InputField v-model="form.totalVolume" label="부피" type="number" unit="L" placeholder="부피" />
+        <div />
       </div>
-      
-      <div class="trash-type-container">
-        <p class="trash-prompt">수거한 쓰레기 종류 * (해당되는 모든 항목 선택, 개수 입력)</p>
-        <div class="checkbox-placeholder">
-          플라스틱 병, 캔, 박스, 부표, 유리병, 밧줄 등...
+
+      <div class="subsection">
+        <div class="subsection-head">
+          <span class="label">수거한 쓰레기 종류* <small>(해당되는 모든 항목 선택, 개수 입력)</small></span>
+        </div>
+
+        <!-- 카테고리 칩 -->
+        <div class="chips">
+          <button
+            v-for="cat in categories"
+            :key="cat.key"
+            type="button"
+            class="chip"
+            :class="{ active: !!form.categoryCounts[cat.key] || selectedCats.includes(cat.key) }"
+            @click="toggleCat(cat.key)"
+          >
+            {{ cat.label }}
+          </button>
+        </div>
+
+        <!-- 선택된 카테고리 개수 입력 -->
+        <div class="cat-grid" v-if="selectedCats.length">
+          <div v-for="key in selectedCats" :key="key" class="cat-row">
+            <InputField
+              v-model="form.categoryCounts[key]"
+              :label="catLabel(key)"
+              type="number"
+              unit="개"
+              placeholder="0"
+            />
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- 4. 현장 사진 및 기록 섹션 -->
-    <section class="section-card">
-      <h3 class="section-title">현장 사진 및 기록</h3>
-      
-      <div class="input-group">
-        <label class="input-label">사진 첨부</label>
-        <div class="photo-placeholder">사진 업로드 영역 (최대 10MB, JPG/PNG)</div>
+    <!-- 현장사진 및 기록 -->
+    <section class="card">
+      <h2 class="card-title">현장사진 및 기록</h2>
+
+      <div class="upload">
+        <div class="upload-head">
+          <span class="badge">필수(최소1)</span>
+          <span class="hint">최대 10MB, JPG/PNG</span>
+        </div>
+
+        <label class="dropzone" @dragover.prevent @drop.prevent="onDrop">
+          <input type="file" accept="image/png, image/jpeg" multiple class="file" @change="onFiles" />
+          <div class="drop-content">
+            <span class="icon">📷</span>
+            <span>클릭하거나 이미지를 끌어다 놓으세요</span>
+          </div>
+        </label>
+
+        <ul class="thumbs" v-if="previews.length">
+          <li v-for="(src, i) in previews" :key="i">
+            <img :src="src" alt="" />
+          </li>
+        </ul>
       </div>
 
-      <div class="input-group">
-        <label class="input-label">기록 (최대 2000자)</label>
-        <textarea class="custom-textarea" v-model="form.memo" placeholder="환경 변화, 느낀 점 등을 자유롭게 작성해주세요."></textarea>
-      </div>
+      <InputField
+        v-model="form.note"
+        as="textarea"
+        label="기록 (최대 2000자)"
+        placeholder="활동 동기, 느낀 점 등을 자유롭게 작성해주세요"
+        :rows="5"
+      />
     </section>
 
-    <!-- 5. 제출 버튼 영역 -->
-    <div class="submit-area">
-      <button class="submit-button" @click="handleSubmit">
-        후기 등록하기
-      </button>
+    <div class="actions">
+      <button class="primary" @click="submit">후기 등록하기</button>
     </div>
-
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
-// 경로가 맞는지 다시 한번 확인해주세요. (일반적으로 src/components/common/InputField.vue)
-import InputField from '@/components/common/InputField.vue'; 
-
+import { ref } from 'vue'
+import InputField from '@/components/common/InputField.vue' // 경로 맞게 조정
 
 const form = ref({
-  // 인원 정보
   writer: '',
+  memberCount: '',
+  org: '',
   title: '',
-  count: 0,
-  groupname: '',
-
-  // 활동 위치 및 시간
   date: '',
-  detailLocation: '', 
+  placeName: '',
+  detailAddress: '',
+  totalWeight: '',
+  totalVolume: '',
+  note: '',
+  categoryCounts: {}, // { key: number }
+})
+const coords = ref({ lng: 130.0, lat: 12.3232 }) // 지도 연동 시 업데이트
 
-  // 쓰레기 정보
-  weight: '',
-  volume: '',
+const dateOptions = Array.from({ length: 14 }).map((_, i) => {
+  const d = new Date()
+  d.setDate(d.getDate() - i)
+  return d.toISOString().slice(0, 10)
+})
 
-  // 현장 사진 및 기록
-  memo: '',
-});
+const categories = [
+  { key: 'plasticBag', label: '플라스틱 봉' },
+  { key: 'can', label: '캔류' },
+  { key: 'box', label: '박스' },
+  { key: 'buoy', label: '부표' },
+  { key: 'fishingGear', label: '어망/어구류' },
+  { key: 'glass', label: '유리병' },
+  { key: 'styro', label: '스티로폼' },
+  { key: 'wood', label: '목재' },
+  { key: 'textile', label: '의류' },
+  { key: 'eWaste', label: '전자제품' },
+  { key: 'others', label: '기타 폐기물' },
+]
 
-const handleSubmit = () => {
-  console.log('폼 제출:', form.value);
-  // 여기에 데이터를 서버로 전송하는 로직을 구현합니다.
-};
+const selectedCats = ref([])
 
+function toggleCat(key) {
+  const i = selectedCats.value.indexOf(key)
+  if (i === -1) selectedCats.value.push(key)
+  else {
+    selectedCats.value.splice(i, 1)
+    delete form.value.categoryCounts[key]
+  }
+}
+
+function catLabel(key) {
+  const item = categories.find(c => c.key === key)
+  return item ? item.label : key
+}
+
+const previews = ref([])
+function onFiles(e) {
+  loadPreviews([...e.target.files])
+}
+function onDrop(e) {
+  const files = [...e.dataTransfer.files].filter(f => /image\/(png|jpe?g)/.test(f.type))
+  loadPreviews(files)
+}
+function loadPreviews(files) {
+  previews.value = []
+  files.slice(0, 8).forEach(file => {
+    const url = URL.createObjectURL(file)
+    previews.value.push(url)
+  })
+}
+
+function submit() {
+  // 간단 검증 (필수값)
+  const required = [
+    ['writer', '작성자'],
+    ['memberCount', '활동인원 수'],
+    ['title', '활동 제목'],
+    ['date', '활동 날짜'],
+    ['placeName', '활동 위치'],
+  ]
+  for (const [k, label] of required) {
+    if (!form.value[k]) {
+      alert(`${label}을(를) 입력해주세요.`)
+      return
+    }
+  }
+  if (!previews.value.length) {
+    alert('현장 사진을 1장 이상 업로드해주세요.')
+    return
+  }
+
+  // 전송 payload 예시
+  const payload = {
+    ...form.value,
+    coords: coords.value,
+    selectedCategories: selectedCats.value,
+  }
+  console.log('SUBMIT', payload)
+  alert('제출 완료! (콘솔 확인)')
+}
 </script>
 
 <style scoped>
-/* A. 전체 컨테이너 및 섹션 스타일 */
-.form-wrapper {
-  max-width: 800px;
-  margin: 0 auto;
+/* Layout */
+.page {
+  background: #eef1f7;
+  min-height: 100vh;
+  padding: 32px 20px 80px;
+}
+.page-title {
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0 0 20px;
+}
+.card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 18px;
   padding: 20px;
-  background-color: #f7f7fa; /* 배경색 통일 */
+  margin-bottom: 18px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+}
+.card-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0 0 14px;
 }
 
-/* ⭐️ [추가] 페이지 최상단 제목 스타일 ⭐️ */
-.page-header {
-    font-size: 2.2rem; 
-    font-weight: 700; 
-    color: #333; 
-    margin-bottom: 30px; 
-    padding-bottom: 15px; 
-    border-bottom: 3px solid #007bff; /* 파란색 밑줄로 강조 */
-}
-
-.section-card {
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  padding: 30px;
-  margin-bottom: 30px;
-}
-
-.section-title {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 20px;
-  border-left: 4px solid #007bff; /* 파란색 줄로 제목 강조 */
-  padding-left: 10px;
-}
-
-/* B. InputField 및 입력 요소 스타일 */
-
-/* 입력 그룹 스타일 (단독 줄) */
-.input-group {
-  margin-bottom: 20px;
-}
-
-/* 2열 레이아웃을 위한 인라인 그룹 (쓰레기 정보 섹션 등) */
-.input-group-inline {
-  display: flex;
-  gap: 20px;
-  margin-bottom: 20px;
-}
-.input-group-inline .input-group,
-.input-group-inline > :deep(.input-field-wrapper) {
-  flex: 1; 
-}
-
-/* 3열 레이아웃을 위한 새로운 인라인 그룹 (인원 정보 섹션) */
-.input-group-triple {
-    display: flex; /* Flexbox 활성화 */
-    gap: 15px; /* 항목 간 간격 조정 */
-    margin-bottom: 20px;
-}
-
-/* 3열 레이아웃의 자식 요소들이 동일한 너비를 갖도록 설정 */
-.input-group-triple > :deep(.input-field-wrapper), 
-.input-group-triple > * {
-    flex: 1; /* 모든 자식 요소가 동일한 비율로 공간을 나눔 */
-    min-width: 0; 
-}
-
-
-/* InputField 라벨에 대한 스타일 */
-.input-label {
-    display: block;
-    font-size: 1rem;
-    font-weight: 500;
-    color: #444;
-    margin-bottom: 8px;
-}
-
-.required::after {
-    content: " *";
-    color: red;
-}
-
-/* C. 커스텀 입력 요소 (맵, 셀렉트, 텍스트 영역) */
-
-.map-placeholder {
-  height: 200px;
-  background: #eee;
-  border: 1px solid #ccc;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: #666;
-  border-radius: 4px;
+/* Grid helpers */
+.grid {
+  display: grid;
+  gap: 14px;
   margin-bottom: 10px;
 }
-
-.map-coords {
-    font-size: 0.85rem;
-    color: #888;
-    margin-top: -5px;
-    margin-bottom: 15px;
+.grid-2 { grid-template-columns: repeat(2, 1fr); }
+.grid-3 { grid-template-columns: repeat(3, 1fr); }
+.grid-4 { grid-template-columns: repeat(4, 1fr); }
+@media (max-width: 960px) {
+  .grid-4 { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 720px) {
+  .grid-3, .grid-2, .grid-4 { grid-template-columns: 1fr; }
 }
 
-.custom-select, .custom-textarea {
+/* Reuse from InputField look-alikes */
+.label {
+  display: inline-block;
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 6px;
+}
+.select {
   width: 100%;
-  padding: 10px 12px;
-  border: 1px solid #ddd;
-  border-radius: 8px; 
-  font-size: 1rem;
-  box-sizing: border-box;
-  transition: border-color 0.2s;
+  padding: 8px 12px;
+  border: 1px solid #8C8C8C;
+  border-radius: 9999px;
+  background: #fff;
+  font-size: 14px;
+  outline: none;
+}
+.select:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37,99,235,.2);
 }
 
-.custom-textarea {
-  min-height: 120px;
-  resize: vertical;
+/* Map */
+.map { margin-top: 10px; }
+.map-placeholder {
+  height: 220px;
+  border: 1px dashed #c7cdd8;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  color: #6b7280;
+  background: #f9fafb;
+}
+.coords {
+  margin: 8px 2px 0;
+  font-size: 12px;
+  color: #6b7280;
 }
 
-/* D. 쓰레기 정보 임시 레이아웃 */
-.trash-type-container {
-    padding: 15px;
-    border: 1px solid #eee;
-    background-color: #f9f9f9;
-    border-radius: 4px;
+/* Chips */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 10px 0 6px;
 }
-.trash-prompt {
-    font-weight: 500;
-    margin-bottom: 10px;
-    font-size: 0.95rem;
-}
-.checkbox-placeholder {
-    color: #999;
-    font-size: 0.9rem;
-    padding: 5px 0;
-}
-
-/* E. 사진 첨부 임시 레이아웃 */
-.photo-placeholder {
-    height: 60px;
-    background: #f0f0f0;
-    border: 2px dashed #ccc;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: #999;
-    border-radius: 4px;
-}
-
-
-/* F. 제출 버튼 */
-.submit-area {
-  padding: 20px 0;
-  text-align: center;
-}
-
-.submit-button {
-  background-color: #213547; /* 어두운 색 버튼 */
-  color: white;
-  border: none;
-  padding: 15px 40px;
-  border-radius: 8px;
-  font-size: 1.1rem;
+.chip {
+  border-radius: 9999px;
+  border: 1px solid #cbd5e1;
+  padding: 6px 12px;
+  background: #fff;
+  font-size: 13px;
   cursor: pointer;
-  transition: background-color 0.3s;
+}
+.chip.active {
+  background: #eef2ff;
+  border-color: #6366f1;
 }
 
-.submit-button:hover {
-  background-color: #34495e;
+/* Upload */
+.upload-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
 }
+.badge {
+  display: inline-block;
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  background: #e8efff;
+  color: #1d4ed8;
+  font-weight: 700;
+}
+.hint { font-size: 12px; color: #6b7280; }
+
+.dropzone {
+  border: 1px dashed #c7cdd8;
+  border-radius: 9999px;
+  padding: 16px;
+  background: #f3f6fb;
+  cursor: pointer;
+  display: block;
+}
+.dropzone:hover { background: #eaf0fb; }
+.file { display: none; }
+.drop-content {
+  display: flex; align-items: center; gap: 8px; justify-content: center;
+  font-size: 14px; color: #6b7280;
+}
+.icon { font-size: 18px; }
+
+.thumbs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+  padding: 0;
+  list-style: none;
+}
+.thumbs li { width: 110px; height: 70px; border-radius: 8px; overflow: hidden; border: 1px solid #e5e7eb; }
+.thumbs img { width: 100%; height: 100%; object-fit: cover; }
+
+/* Section subtleties */
+.subsection { margin-top: 8px; }
+.subsection-head .label { margin-bottom: 0; }
+
+/* Actions */
+.actions { display: flex; justify-content: center; margin-top: 16px; }
+.primary {
+  padding: 12px 22px;
+  border-radius: 12px;
+  background: #2f327d;
+  color: #fff;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+}
+.primary:hover { filter: brightness(0.95); }
 </style>
