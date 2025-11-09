@@ -187,18 +187,52 @@ const loadNaverMapAPI = () => {
 }
 
 // 지도 위에 마커 표시 함수
+
+import redPinImg from '@/assets/redpin.png'
+import bluePinImg from '@/assets/bluepin.png'
+import whitePinImg from '@/assets/whitepin.png'
+
 const renderMarkers = () => {
   // 기존 마커 제거
   markers.value.forEach(marker => marker.setMap(null))
   markers.value = []
   if (!map.value) return
   pins.value.forEach(pin => {
-    // 백엔드에서 pinY: 위도, pinX: 경도
     if (pin.pinY && pin.pinX) {
+      let icon = null
+      if (pin.pinColor) {
+        const color = pin.pinColor.toLowerCase()
+        if (color === 'red') {
+          icon = {
+            url: redPinImg,
+            size: new window.naver.maps.Size(32, 32),
+            scaledSize: new window.naver.maps.Size(32, 32),
+            origin: new window.naver.maps.Point(0, 0),
+            anchor: new window.naver.maps.Point(16, 32)
+          }
+        } else if (color === 'blue') {
+          icon = {
+            url: bluePinImg,
+            size: new window.naver.maps.Size(32, 32),
+            scaledSize: new window.naver.maps.Size(32, 32),
+            origin: new window.naver.maps.Point(0, 0),
+            anchor: new window.naver.maps.Point(16, 32)
+          }
+        } else if (color === 'white') {
+          icon = {
+            url: whitePinImg,
+            size: new window.naver.maps.Size(32, 32),
+            scaledSize: new window.naver.maps.Size(32, 32),
+            origin: new window.naver.maps.Point(0, 0),
+            anchor: new window.naver.maps.Point(16, 32)
+          }
+        }
+      }
       const marker = new window.naver.maps.Marker({
         position: new window.naver.maps.LatLng(pin.pinY, pin.pinX),
         map: map.value,
-        title: pin.title || pin.pinId?.toString() || ''
+        title: pin.title || pin.pinId?.toString() || '',
+        ...(icon ? { icon } : {})
       })
       markers.value.push(marker)
     }
