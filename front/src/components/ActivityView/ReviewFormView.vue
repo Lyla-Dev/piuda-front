@@ -29,9 +29,9 @@
         <InputField v-model="form.placeName" label="활동 위치*" placeholder="예: 공경리 해변" required />
       </div>
 
-      <!-- 지도 자리 (추후 지도 SDK로 교체) -->
+      <!-- 네이버 지도 -->
       <div class="map">
-        <div class="map-placeholder">지도 영역 (SDK 연동 예정)</div>
+        <div id="naverMap" class="map-area"></div>
       </div>
 
       <p class="coords">좌표: ({{ coords.lng.toFixed(4) }}, {{ coords.lat.toFixed(4) }})</p>
@@ -130,8 +130,9 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import InputField from '@/components/common/InputField.vue' // 경로 맞게 조정
+import { ref, onMounted, onBeforeUnmount } from 'vue'
+import InputField from '@/components/common/InputField.vue'
+import axios from 'axios'
 
 const form = ref({
   writer: '',
@@ -146,7 +147,63 @@ const form = ref({
   note: '',
   categoryCounts: {}, // { key: number }
 })
-const coords = ref({ lng: 130.0, lat: 12.3232 }) // 지도 연동 시 업데이트
+
+const coords = ref({ lng: 126.9784, lat: 37.5666 }) // 서울 중심으로 초기값
+const map = ref(null)
+const marker = ref(null)
+
+// 네이버 지도 API 키
+const clientId = process.env.VUE_APP_NAVER_MAP_CLIENT_ID
+
+// 네이버 지도 API 로드
+const loadNaverMapAPI = () => {
+  return new Promise((resolve, reject) => {
+    if (window.naver && window.naver.maps) {
+      resolve()
+      return
+    }
+
+    const script = document.createElement('script')
+    script.src = `https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=${clientId}`
+    
+    script.onload = resolve
+    script.onerror = reject
+    document.head.appendChild(script)
+  })
+}
+
+// 지도 초기화
+const initializeMap = () => {
+  if (!window.naver || !window.naver.maps) {
+    console.error('네이버 지도 API가 로드되지 않았습니다.')
+    return
+  }
+
+  const mapOptions = {
+    center: new window.naver.maps.LatLng(coords.value.lat, coords.value.lng),
+    zoom: 15,
+    mapTypeControl: false,
+    scaleControl: true,
+    logoControl: true,
+    mapDataControl: true
+  }
+
+  map.value = new window.naver.maps.Map('naverMap', mapOptions)
+  
+  // 드래그 가능한 마커 생성
+  marker.value = new window.naver.maps.Marker({
+    position: new window.naver.maps.LatLng(coords.value.lat, coords.value.lng),
+    map: map.value,
+    draggable: true
+  })
+
+  // 마커 드래그 이벤트 리스너
+  window.naver.maps.Event.addListener(marker.value, 'dragend', function() {
+    const position = marker.value.getPosition()
+    coords.value.lat = position.lat()
+    coords.value.lng = position.lng()
+  })
+}
 
 const dateOptions = Array.from({ length: 14 }).map((_, i) => {
   const d = new Date()
@@ -155,17 +212,15 @@ const dateOptions = Array.from({ length: 14 }).map((_, i) => {
 })
 
 const categories = [
-  { key: 'plasticBag', label: '플라스틱 봉' },
-  { key: 'can', label: '캔류' },
-  { key: 'box', label: '박스' },
-  { key: 'buoy', label: '부표' },
-  { key: 'fishingGear', label: '어망/어구류' },
-  { key: 'glass', label: '유리병' },
-  { key: 'styro', label: '스티로폼' },
-  { key: 'wood', label: '목재' },
-  { key: 'textile', label: '의류' },
-  { key: 'eWaste', label: '전자제품' },
-  { key: 'others', label: '기타 폐기물' },
+  { key: 'trashPet', label: '페트병' },
+  { key: 'trashBag', label: '비닐봉지' },
+  { key: 'trashCan', label: '캔류' },
+  { key: 'trashNet', label: '어망/어구류' },
+  { key: 'trashGlass', label: '유리병' },
+  { key: 'trashRope', label: '로프끈' },
+  { key: 'trashCloth', label: '의류' },
+  { key: 'trashElec', label: '전자제품' },
+  { key: 'trashEtc', label: '기타 폐기물' },
 ]
 
 const selectedCats = ref([])
@@ -220,15 +275,78 @@ function submit() {
     return
   }
 
-  // 전송 payload 예시
-  const payload = {
-    ...form.value,
-    coords: coords.value,
-    selectedCategories: selectedCats.value,
+  // API 명세에 맞게 payload 구성
+  const reportData = {
+    reportName: form.value.writer,
+    reportPeople: parseInt(form.value.memberCount),
+    reportTitle: form.value.title,
+    reportDate: form.value.date,
+    reportDetailLocation: form.value.detailAddress,
+    reportContent: form.value.note,
+    pinX: coords.value.lng,
+    pinY: coords.value.lat,
+    trashKg: parseFloat(form.value.totalWeight) || 0,
+    trashL: parseFloat(form.value.totalVolume) || 0,
+    trashPet: parseInt(form.value.categoryCounts.trashPet) || 0,
+    trashBag: parseInt(form.value.categoryCounts.trashBag) || 0,
+    trashNet: parseInt(form.value.categoryCounts.trashNet) || 0,
+    trashGlass: parseInt(form.value.categoryCounts.trashGlass) || 0,
+    trashCan: parseInt(form.value.categoryCounts.trashCan) || 0,
+    trashRope: parseInt(form.value.categoryCounts.trashRope) || 0,
+    trashCloth: parseInt(form.value.categoryCounts.trashClothes) || 0,
+    trashElec: parseInt(form.value.categoryCounts.trashElec) || 0,
+    trashEtc: parseInt(form.value.categoryCounts.trashEtc) || 0
   }
-  console.log('SUBMIT', payload)
-  alert('제출 완료! (콘솔 확인)')
+
+  // FormData로 multipart/form-data 구성
+  const formData = new FormData()
+
+  formData.append(
+  'report',
+  new Blob([JSON.stringify(reportData)], { type: 'application/json' })
+)
+  // 사진 파일들 추가
+  const fileInput = document.querySelector('input[type="file"]')
+  if (fileInput && fileInput.files) {
+    for (let i = 0; i < fileInput.files.length; i++) {
+      formData.append('photos', fileInput.files[i])
+    }
+  }
+
+  // 백엔드로 전송
+  submitToBackend(formData)
 }
+
+const submitToBackend = async (formData) => {
+  try {
+    const response = await axios.post('http://localhost:8080/api/report', formData, {
+      /*headers: {
+        'Content-Type': 'multipart/form-data'
+      }*/
+    })
+    console.log('후기 등록 성공:', response.data)
+    alert('후기가 성공적으로 등록되었습니다!')
+  } catch (error) {
+    console.error('후기 등록 실패:', error)
+    alert('후기 등록에 실패했습니다. 다시 시도해주세요.')
+  }
+}
+
+// 라이프사이클 훅
+onMounted(async () => {
+  try {
+    await loadNaverMapAPI()
+    initializeMap()
+  } catch (error) {
+    console.error('네이버 지도 API 로드 실패:', error)
+  }
+})
+
+onBeforeUnmount(() => {
+  if (map.value) {
+    map.value.destroy()
+  }
+})
 </script>
 
 <style scoped>
@@ -298,14 +416,11 @@ function submit() {
 
 /* Map */
 .map { margin-top: 10px; }
-.map-placeholder {
-  height: 220px;
-  border: 1px dashed #c7cdd8;
+.map-area {
+  width: 100%;
+  height: 300px;
+  border: 1px solid #e5e7eb;
   border-radius: 12px;
-  display: grid;
-  place-items: center;
-  color: #6b7280;
-  background: #f9fafb;
 }
 .coords {
   margin: 8px 2px 0;
