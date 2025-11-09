@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "vue-router": "^4.6.3"
+  },
+  "devDependencies": {
+    "@babel/eslint-parser": "^7.28.5",
+    "eslint-plugin-vue": "^10.5.1"
+  }
+}
