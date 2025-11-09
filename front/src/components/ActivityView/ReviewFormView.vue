@@ -237,6 +237,8 @@ function submit() {
   background: #eef1f7;
   min-height: 100vh;
   padding: 32px 20px 80px;
+  max-width: 900px;
+  margin: 0 auto;
 }
 .page-title {
   font-size: 24px;
@@ -392,4 +394,11 @@ function submit() {
   cursor: pointer;
 }
 .primary:hover { filter: brightness(0.95); }
+</style>
+
+<style>
+html, body {
+  background: #eef1f7 !important;
+  min-height: 100vh;
+}
 </style>
