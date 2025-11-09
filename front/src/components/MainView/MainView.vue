@@ -238,7 +238,7 @@ onBeforeUnmount(() => {
 .hero {
   position: relative;
   width: 100%;
-  height: 100vh;
+  height: 65vh;
   overflow: hidden;
 }
 
