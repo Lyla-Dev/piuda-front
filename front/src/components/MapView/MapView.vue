@@ -90,9 +90,12 @@
 
 <script setup>
 import { ref, reactive, onMounted, onBeforeUnmount } from 'vue'
+import { fetchPins } from './MapApi'
 
 const map = ref(null)
 const isFilterOpen = ref(false)
+const pins = ref([]) // 핀 데이터 상태
+const markers = ref([]) // 지도 마커 상태
 
 // 필터 상태
 const filters = reactive({
@@ -183,28 +186,56 @@ const loadNaverMapAPI = () => {
   })
 }
 
+// 지도 위에 마커 표시 함수
+const renderMarkers = () => {
+  // 기존 마커 제거
+  markers.value.forEach(marker => marker.setMap(null))
+  markers.value = []
+  if (!map.value) return
+  pins.value.forEach(pin => {
+    // 백엔드에서 pinY: 위도, pinX: 경도
+    if (pin.pinY && pin.pinX) {
+      const marker = new window.naver.maps.Marker({
+        position: new window.naver.maps.LatLng(pin.pinY, pin.pinX),
+        map: map.value,
+        title: pin.title || pin.pinId?.toString() || ''
+      })
+      markers.value.push(marker)
+    }
+  })
+}
+
+// 핀 데이터 불러오기
+const loadPins = async () => {
+  try {
+    pins.value = await fetchPins()
+    renderMarkers()
+  } catch (e) {
+    console.error('핀 데이터 불러오기 실패:', e)
+  }
+}
+
 // 지도 초기화
 const initializeMap = () => {
   if (!window.naver || !window.naver.maps) {
     console.error('네이버 지도 API가 로드되지 않았습니다.')
     return
   }
-
-  // 지도 옵션
   const mapOptions = {
-    center: new window.naver.maps.LatLng(36.5, 127.5), // 한국 중심
+    center: new window.naver.maps.LatLng(36.5, 127.5),
     zoom: 7,
     mapTypeControl: false,
     scaleControl: true,
     logoControl: true,
     mapDataControl: true
   }
-
-  // 지도 생성
   map.value = new window.naver.maps.Map('naverMap', mapOptions)
+  // 지도 초기화 후 핀 데이터 불러오기
+  loadPins()
 }
 
 // 라이프사이클 훅
+
 onMounted(async () => {
   try {
     await loadNaverMapAPI()
