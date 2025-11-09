@@ -353,17 +353,16 @@ onBeforeUnmount(() => {
   justify-content: space-between;
   width: 100%;
   max-width: 1200px;
-  flex-wrap: wrap;
+  flex-wrap: nowrap; /* 항상 가로로 유지 */
   margin: 0 auto;
-  gap: 3rem;
+  gap: 2rem;
 }
 
 /* 왼쪽 텍스트 영역 */
 .mission-text {
-  flex: 0 0 350px;
-  min-width: 260px;
-  margin-right: -2rem;
-  padding-left: 3rem;
+  flex: 0 0 300px;
+  min-width: 250px;
+  padding-left: 2rem;
 }
 .mission-text h2 {
   font-size: 2rem;
@@ -378,11 +377,81 @@ onBeforeUnmount(() => {
 
 /* 오른쪽 버튼 영역 */
 .mission-buttons {
-  flex: 0 0 500px;
+  flex: 1;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 2rem;
+  gap: 1.5rem;
   justify-items: center;
+  max-width: 600px;
+}
+
+/* 반응형 CSS - 화면이 작아질 때 */
+@media (max-width: 1024px) {
+  .mission-container {
+    gap: 1.5rem;
+  }
+  
+  .mission-text {
+    flex: 0 0 280px;
+    min-width: 220px;
+    padding-left: 1rem;
+  }
+  
+  .mission-text h2 {
+    font-size: 1.8rem;
+  }
+  
+  .mission-text p {
+    font-size: 1rem;
+  }
+  
+  .mission-buttons {
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 900px) {
+  .mission-container {
+    gap: 1rem;
+  }
+  
+  .mission-text {
+    flex: 0 0 250px;
+    min-width: 200px;
+  }
+  
+  .mission-text h2 {
+    font-size: 1.6rem;
+  }
+  
+  .mission-text p {
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+}
+
+@media (max-width: 768px) {
+  .mission {
+    padding: 3rem 1rem;
+  }
+  
+  .mission-container {
+    flex-wrap: wrap; /* 모바일에서만 세로로 정렬 */
+    justify-content: center;
+    text-align: center;
+  }
+  
+  .mission-text {
+    flex: none;
+    width: 100%;
+    padding-left: 0;
+  }
+  
+  .mission-buttons {
+    flex: none;
+    width: 100%;
+    max-width: 480px;
+  }
 }
 
 /* 버튼 스타일 */
@@ -391,12 +460,12 @@ onBeforeUnmount(() => {
   border: 2px solid #1a2b6d;
   color: #374151;
   padding: 1.5rem;
-  width: 240px;
-  height: 130px;
+  width: 280px;
+  height: 120px;
   border-radius: 16px;
   cursor: pointer;
   font-weight: 700;
-  font-size: 1.4rem;
+  font-size: 1.3rem;
   transition: 0.3s;
   display: flex;
   flex-direction: row;
@@ -409,6 +478,50 @@ onBeforeUnmount(() => {
   background: #e5e7eb;
   transform: translateY(-1px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* 버튼 반응형 크기 조정 */
+@media (max-width: 1024px) {
+  .mission-buttons button {
+    width: 260px;
+    height: 110px;
+    font-size: 1.2rem;
+    gap: 1rem;
+  }
+  
+  .button-icon {
+    width: 56px;
+    height: 56px;
+  }
+}
+
+@media (max-width: 900px) {
+  .mission-buttons button {
+    width: 240px;
+    height: 100px;
+    font-size: 1.1rem;
+    gap: 0.8rem;
+    padding: 1rem;
+  }
+  
+  .button-icon {
+    width: 48px;
+    height: 48px;
+  }
+}
+
+@media (max-width: 768px) {
+  .mission-buttons button {
+    width: 280px;
+    height: 120px;
+    font-size: 1.3rem;
+    gap: 1rem;
+  }
+  
+  .button-icon {
+    width: 60px;
+    height: 60px;
+  }
 }
 
 /* 버튼 아이콘 */
