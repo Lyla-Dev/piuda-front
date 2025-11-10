@@ -163,21 +163,22 @@ function submit() {
   }
 
   // API 명세에 맞게 payload 구성
-  const reportData = {
-    pinX: coords.value.lng,
-    pinY: coords.value.lat,
-    description: form.value.description || ''
+  const payload = {
+    x: coords.value.lng,
+    y: coords.value.lat,
+    content: form.value.description || ''
   }
 
   // FormData로 multipart/form-data 구성
   const formData = new FormData()
 
+  // payload 부분 (application/json)
   formData.append(
-    'report',
-    new Blob([JSON.stringify(reportData)], { type: 'application/json' })
+    'payload',
+    new Blob([JSON.stringify(payload)], { type: 'application/json' })
   )
 
-  // 사진 파일들 추가
+  // 사진 파일들 추가 (photos 부분)
   const fileInput = document.querySelector('input[type="file"]')
   if (fileInput && fileInput.files) {
     for (let i = 0; i < fileInput.files.length; i++) {
@@ -191,10 +192,10 @@ function submit() {
 
 const submitToBackend = async (formData) => {
   try {
-    const response = await axios.post('http://localhost:8080/api/trash-report', formData, {
-      /*headers: {
+    const response = await axios.post('http://localhost:8080/api/notify', formData, {
+      headers: {
         'Content-Type': 'multipart/form-data'
-      }*/
+      }
     })
     console.log('쓰레기 신고 성공:', response.data)
     alert('해양 쓰레기 신고가 성공적으로 접수되었습니다!')
