@@ -34,6 +34,7 @@
         <div id="naverMap" class="map-area"></div>
       </div>
 
+      <p class="coords">📍 지도를 드래그하여 정확한 위치를 선택하세요</p>
       <p class="coords">좌표: ({{ coords.lng.toFixed(4) }}, {{ coords.lat.toFixed(4) }})</p>
 
       <InputField
@@ -131,8 +132,11 @@
 
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { useRouter } from 'vue-router'
 import InputField from '@/components/common/InputField.vue'
 import axios from 'axios'
+
+const router = useRouter()
 
 const form = ref({
   writer: '',
@@ -190,18 +194,31 @@ const initializeMap = () => {
 
   map.value = new window.naver.maps.Map('naverMap', mapOptions)
   
-  // 드래그 가능한 마커 생성
+  // 지도 중앙에 고정된 마커 생성 (드래그 불가)
   marker.value = new window.naver.maps.Marker({
     position: new window.naver.maps.LatLng(coords.value.lat, coords.value.lng),
     map: map.value,
-    draggable: true
+    draggable: false
   })
 
-  // 마커 드래그 이벤트 리스너
-  window.naver.maps.Event.addListener(marker.value, 'dragend', function() {
-    const position = marker.value.getPosition()
-    coords.value.lat = position.lat()
-    coords.value.lng = position.lng()
+  // 지도 드래그 이벤트 리스너 - 지도가 움직일 때마다 중앙 좌표 업데이트
+  window.naver.maps.Event.addListener(map.value, 'dragend', function() {
+    const center = map.value.getCenter()
+    coords.value.lat = center.lat()
+    coords.value.lng = center.lng()
+    
+    // 마커 위치도 지도 중앙으로 업데이트
+    marker.value.setPosition(center)
+  })
+
+  // 지도 중심이 변경될 때도 좌표 업데이트 (확대/축소 등)
+  window.naver.maps.Event.addListener(map.value, 'center_changed', function() {
+    const center = map.value.getCenter()
+    coords.value.lat = center.lat()
+    coords.value.lng = center.lng()
+    
+    // 마커 위치도 지도 중앙으로 업데이트
+    marker.value.setPosition(center)
   })
 }
 
@@ -326,6 +343,9 @@ const submitToBackend = async (formData) => {
     })
     console.log('후기 등록 성공:', response.data)
     alert('후기가 성공적으로 등록되었습니다!')
+    
+    // 성공 시 메인페이지로 이동 (히스토리 스택에 쌓이지 않게 replace 사용)
+    router.replace({ name: 'Home' })
   } catch (error) {
     console.error('후기 등록 실패:', error)
     alert('후기 등록에 실패했습니다. 다시 시도해주세요.')
