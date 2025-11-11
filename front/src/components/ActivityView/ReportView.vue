@@ -58,7 +58,7 @@
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
 import InputField from '@/components/common/InputField.vue'
-import axios from 'axios'
+import http from '@/api/http'
 
 const router = useRouter()
 
@@ -192,7 +192,7 @@ function submit() {
 
 const submitToBackend = async (formData) => {
   try {
-    const response = await axios.post('http://localhost:8080/api/notify', formData, {
+    const response = await http.post('/notify', formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
