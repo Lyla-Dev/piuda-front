@@ -58,7 +58,7 @@
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
 import InputField from '@/components/common/InputField.vue'
-import axios from 'axios'
+import http from '@/api/http'
 
 const router = useRouter()
 
@@ -192,19 +192,31 @@ function submit() {
 
 const submitToBackend = async (formData) => {
   try {
-    const response = await axios.post('http://localhost:8080/api/notify', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
-    })
+    // Let the browser set the Content-Type (with boundary) for FormData.
+    const response = await http.post('/notify', formData)
     console.log('쓰레기 신고 성공:', response.data)
     alert('해양 쓰레기 신고가 성공적으로 접수되었습니다!')
-    
+
     // 성공 시 메인페이지로 이동 (히스토리 스택에 쌓이지 않게 replace 사용)
     router.replace({ name: 'Home' })
   } catch (error) {
-    console.error('쓰레기 신고 실패:', error)
-    alert('신고 접수에 실패했습니다. 다시 시도해주세요.')
+    // Better error logging to help diagnose 500s
+    if (error.response) {
+      // Server responded with a status code outside 2xx
+      console.error('Server response error:', error.response.status, error.response.data)
+      alert(`신고 접수에 실패했습니다. 서버 응답 코드: ${error.response.status}`)
+    } else if (error.request) {
+      // Request was made but no response received
+      console.error('No response received:', error.request)
+      alert('서버에서 응답이 없습니다. 네트워크를 확인하세요.')
+    } else {
+      // Something happened in setting up the request
+      console.error('Request setup error:', error.message)
+      alert('요청 설정 중 오류가 발생했습니다.')
+    }
+
+    // include full Axios error object for debugging in dev console
+    console.debug('Axios error details:', error.toJSON ? error.toJSON() : error)
   }
 }
 

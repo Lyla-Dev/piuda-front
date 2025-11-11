@@ -1,6 +1,4 @@
-import axios from 'axios'
-
-const BASE_URL = 'http://localhost:8080/api'
+import http from '@/api/http'
 
 /**
  * 핀 데이터를 백엔드에서 가져오는 함수
@@ -8,7 +6,7 @@ const BASE_URL = 'http://localhost:8080/api'
  */
 export const fetchPins = async () => {
   try {
-    const response = await axios.get(`${BASE_URL}/pins`)
+    const response = await http.get('/pins')
     return response.data
   } catch (error) {
     console.error('핀 데이터 불러오기 실패:', error)
@@ -23,7 +21,7 @@ export const fetchPins = async () => {
  */
 export const fetchPinsWithFilters = async (filters) => {
   try {
-    const response = await axios.get(`${BASE_URL}/pins`, {
+    const response = await http.get('/pins', {
       params: filters
     })
     return response.data
