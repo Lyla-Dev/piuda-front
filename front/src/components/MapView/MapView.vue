@@ -2,6 +2,34 @@
   <div class="map-container">
     <div id="naverMap" class="map"></div>
     
+    <!-- 핀 정보 모달 -->
+    <div v-if="selectedPin" class="pin-info-modal" @click="closeModal">
+      <div class="pin-info-content" @click.stop>
+        <button class="close-btn" @click="closeModal">×</button>
+        <h3 class="pin-title">
+          <span v-if="selectedPin.pinColor?.toLowerCase() === 'red'">정화필요지역</span>
+          <span v-else-if="selectedPin.pinColor?.toLowerCase() === 'blue'">활동완료지역</span>
+          <span v-else-if="selectedPin.pinColor?.toLowerCase() === 'white'">신규지역</span>
+          <span v-else>핀 정보</span>
+        </h3>
+        <div class="pin-details">
+          <div class="coords">
+            <strong>위치 정보:</strong><br>
+            위도: {{ selectedPin.pinY?.toFixed(4) }}<br>
+            경도: {{ selectedPin.pinX?.toFixed(4) }}
+          </div>
+          <div v-if="selectedPin.notifyContent" class="notify-content">
+            <strong>내용:</strong><br>
+            {{ selectedPin.notifyContent }}
+          </div>
+          <div v-if="selectedPinImageUrl" class="notify-photo">
+            <strong>사진:</strong><br>
+            <img :src="selectedPinImageUrl" alt="핀 사진" />
+          </div>
+        </div>
+      </div>
+    </div>
+    
     <!-- 필터 버튼 및 패널 -->
     <div class="filter-container">
       <div class="filter-panel" :class="{ open: isFilterOpen }">
@@ -89,186 +117,27 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, onBeforeUnmount } from 'vue'
-import { fetchPins } from './MapApi'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { useMapLogic } from './MapLogic'
 
-const map = ref(null)
+// MapLogic에서 지도 관련 로직 가져오기
+const {
+  map,
+  filters,
+  loadNaverMapAPI,
+  initializeMap,
+  resetFilters,
+  selectedPin,
+  selectedPinImageUrl,
+  closeModal
+} = useMapLogic()
+
 const isFilterOpen = ref(false)
-const pins = ref([]) // 핀 데이터 상태
-const markers = ref([]) // 지도 마커 상태
-
-// 필터 상태
-const filters = reactive({
-  startDate: '2025-10-09',
-  endDate: '2025-10-09',
-  orgs: {
-    dft: false,
-    ocean: false,
-    busan: false,
-    covo: false,
-    ssdamsokcho: false,
-    jigu: false,
-    sseom: false,
-    cleanup: false,
-    ecoteam: false,
-    ocean_protect: false,
-    project: false,
-    environment: false,
-    plog: false,
-    leader: false,
-    plogkorea: false,
-    bakaji: false,
-    team: false,
-    jeju: false,
-    honey: false,
-    sea: false,
-    other: false
-  },
-  regions: {
-    west: false,
-    east: false,
-    south: false,
-    jeju: false,
-    inland: false
-  },
-  quantity: {
-    low: false,
-    mid: false,
-    high: false,
-    vhigh: false
-  }
-})
 
 // 필터 토글 함수
 const toggleFilter = () => {
   isFilterOpen.value = !isFilterOpen.value
 }
-
-// 필터 초기화 함수
-const resetFilters = () => {
-  filters.startDate = '2025-10-09'
-  filters.endDate = '2025-10-09'
-  
-  // 모든 단체 체크 해제
-  Object.keys(filters.orgs).forEach(key => {
-    filters.orgs[key] = false
-  })
-  
-  // 모든 권역 체크 해제
-  Object.keys(filters.regions).forEach(key => {
-    filters.regions[key] = false
-  })
-  
-  // 모든 수거량 체크 해제
-  Object.keys(filters.quantity).forEach(key => {
-    filters.quantity[key] = false
-  })
-}
-
-// 네이버 클라우드 플랫폼 Maps API 키 (환경변수에서 가져오기)
-const clientId = process.env.VUE_APP_NAVER_MAP_CLIENT_ID
-
-// 네이버 클라우드 플랫폼 Maps API 로드
-const loadNaverMapAPI = () => {
-  return new Promise((resolve, reject) => {
-    if (window.naver && window.naver.maps) {
-      resolve()
-      return
-    }
-
-    // 네이버 클라우드 플랫폼 Maps API
-    const script = document.createElement('script')
-    script.src = `https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=${clientId}`
-    
-    script.onload = resolve
-    script.onerror = reject
-    document.head.appendChild(script)
-  })
-}
-
-// 지도 위에 마커 표시 함수
-
-import redPinImg from '@/assets/redpin.png'
-import bluePinImg from '@/assets/bluepin.png'
-import whitePinImg from '@/assets/whitepin.png'
-
-const renderMarkers = () => {
-  // 기존 마커 제거
-  markers.value.forEach(marker => marker.setMap(null))
-  markers.value = []
-  if (!map.value) return
-  pins.value.forEach(pin => {
-    if (pin.pinY && pin.pinX) {
-      let icon = null
-      if (pin.pinColor) {
-        const color = pin.pinColor.toLowerCase()
-        if (color === 'red') {
-          icon = {
-            url: redPinImg,
-            size: new window.naver.maps.Size(32, 32),
-            scaledSize: new window.naver.maps.Size(32, 32),
-            origin: new window.naver.maps.Point(0, 0),
-            anchor: new window.naver.maps.Point(16, 32)
-          }
-        } else if (color === 'blue') {
-          icon = {
-            url: bluePinImg,
-            size: new window.naver.maps.Size(32, 32),
-            scaledSize: new window.naver.maps.Size(32, 32),
-            origin: new window.naver.maps.Point(0, 0),
-            anchor: new window.naver.maps.Point(16, 32)
-          }
-        } else if (color === 'white') {
-          icon = {
-            url: whitePinImg,
-            size: new window.naver.maps.Size(32, 32),
-            scaledSize: new window.naver.maps.Size(32, 32),
-            origin: new window.naver.maps.Point(0, 0),
-            anchor: new window.naver.maps.Point(16, 32)
-          }
-        }
-      }
-      const marker = new window.naver.maps.Marker({
-        position: new window.naver.maps.LatLng(pin.pinY, pin.pinX),
-        map: map.value,
-        title: pin.title || pin.pinId?.toString() || '',
-        ...(icon ? { icon } : {})
-      })
-      markers.value.push(marker)
-    }
-  })
-}
-
-// 핀 데이터 불러오기
-const loadPins = async () => {
-  try {
-    pins.value = await fetchPins()
-    renderMarkers()
-  } catch (e) {
-    console.error('핀 데이터 불러오기 실패:', e)
-  }
-}
-
-// 지도 초기화
-const initializeMap = () => {
-  if (!window.naver || !window.naver.maps) {
-    console.error('네이버 지도 API가 로드되지 않았습니다.')
-    return
-  }
-  const mapOptions = {
-    center: new window.naver.maps.LatLng(36.5, 127.5),
-    zoom: 7,
-    mapTypeControl: false,
-    scaleControl: true,
-    logoControl: true,
-    mapDataControl: true
-  }
-  map.value = new window.naver.maps.Map('naverMap', mapOptions)
-  // 지도 초기화 후 핀 데이터 불러오기
-  loadPins()
-}
-
-// 라이프사이클 훅
 
 onMounted(async () => {
   try {
@@ -296,6 +165,90 @@ onBeforeUnmount(() => {
 .map {
   width: 100%;
   height: 100%;
+}
+
+/* 핀 정보 모달 */
+.pin-info-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+}
+
+.pin-info-content {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  max-width: 400px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.close-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #666;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.close-btn:hover {
+  background: #f0f0f0;
+}
+
+.pin-title {
+  margin: 0 0 16px 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: #2f327d;
+}
+
+.pin-details {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.coords {
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.notify-content {
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.notify-photo {
+  text-align: center;
+}
+
+.notify-photo img {
+  max-width: 100%;
+  max-height: 200px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 /* 필터 컨테이너 */
