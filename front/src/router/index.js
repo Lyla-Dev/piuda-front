@@ -8,6 +8,9 @@ import ActivityList from "@/components/ActivityView/ActivityList.vue";
 import ReviewForm from "@/components/ActivityView/ReviewFormView.vue"
 import LoginView from '@/components/LoginView/LoginView.vue'
 import ReviewList from '@/components/ActivityView/ReviewList.vue'
+import MyDashboard from '@/components/DashBoardView/MyDashboard.vue'
+import CorpsDashboard from '@/components/DashBoardView/CorpsDashboard.vue'
+import ManagerDashboard from '@/components/DashBoardView/ManagerDashboard.vue'
 
 const routes = [
   { path: '/', name: 'Home', component: MainView },
@@ -18,7 +21,10 @@ const routes = [
   { path: '/report', name: 'Report', component: ReportView },
   { path: '/activity-list', name: 'ActivityList', component: ActivityList}, 
   { path: '/review-form', name: 'ReviewForm', component: ReviewForm },
-  { path: '/review-list', name: 'ReviewList', component: ReviewList }
+  { path: '/review-list', name: 'ReviewList', component: ReviewList },
+  { path: '/my-dashboard', name: 'MyDashboard', component: MyDashboard },
+  { path: '/corps-dashboard', name: 'CorpsDashboard', component: CorpsDashboard },
+  { path: '/manager-dashboard', name: 'ManagerDashboard', component: ManagerDashboard }
 ]
 
 const router = createRouter({
