@@ -11,7 +11,8 @@
         <div id="naverMap" class="map-area-large"></div>
       </div>
 
-      <p class="coords">📍 지도를 드래그하여 정확한 위치를 선택하세요</p>
+      <p class="coords" v-if="isLocationLoading">📍 현재 위치를 가져오고 있습니다...</p>
+      <p class="coords" v-else>📍 지도를 드래그하여 정확한 위치를 선택하세요</p>
       <p class="coords">좌표: ({{ coords.lng.toFixed(4) }}, {{ coords.lat.toFixed(4) }})</p>
     </section>
 
@@ -69,9 +70,42 @@ const form = ref({
 const coords = ref({ lng: 126.9784, lat: 37.5666 }) // 서울 중심으로 초기값
 const map = ref(null)
 const marker = ref(null)
+const isLocationLoading = ref(false)
 
 // 네이버 지도 API 키
 const clientId = process.env.VUE_APP_NAVER_MAP_CLIENT_ID
+
+// 현재 위치 가져오기
+const getCurrentLocation = () => {
+  return new Promise((resolve, reject) => {
+    if (!navigator.geolocation) {
+      reject(new Error('Geolocation이 지원되지 않는 브라우저입니다.'))
+      return
+    }
+
+    isLocationLoading.value = true
+    
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        isLocationLoading.value = false
+        resolve({
+          lat: position.coords.latitude,
+          lng: position.coords.longitude
+        })
+      },
+      (error) => {
+        isLocationLoading.value = false
+        console.warn('위치 정보를 가져올 수 없습니다:', error.message)
+        reject(error)
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 300000 // 5분간 캐시된 위치 정보 사용
+      }
+    )
+  })
+}
 
 // 네이버 지도 API 로드
 const loadNaverMapAPI = () => {
@@ -211,6 +245,16 @@ const submitToBackend = async (formData) => {
 // 라이프사이클 훅
 onMounted(async () => {
   try {
+    // 먼저 현재 위치를 가져오려고 시도
+    try {
+      const currentLocation = await getCurrentLocation()
+      coords.value = currentLocation
+      console.log('현재 위치로 설정:', currentLocation)
+    } catch (locationError) {
+      console.warn('현재 위치를 가져올 수 없어 기본 위치(서울)를 사용합니다:', locationError.message)
+      // 기본값 유지
+    }
+    
     await loadNaverMapAPI()
     initializeMap()
   } catch (error) {
