@@ -30,6 +30,18 @@
       </div>
     </div>
 
+    <MapSidePanel
+  :is-open="!!selectedPin"
+  :pin-detail="selectedPin"
+  :activity-logs="[]"
+  @close="closeModal"
+  @register-activity="openActivityRegisterForm"
+/>
+
+
+
+
+
     <!-- 필터 패널 컴포넌트 -->
     <MapFilterPanel
       v-model:filters="filters"
@@ -42,6 +54,9 @@
 import { onMounted, onBeforeUnmount } from 'vue'
 import { useMapLogic } from './MapLogic'
 import MapFilterPanel from './MapFilters/MapFilterPanel.vue'
+import MapSidePanel from './MapSidePanel.vue'
+
+
 
 // MapLogic에서 지도 관련 로직 가져오기
 const {
@@ -54,6 +69,11 @@ const {
   selectedPinImageUrl,
   closeModal
 } = useMapLogic()
+
+// 사이드바 "활동 등록하기" 버튼용 임시 함수
+const openActivityRegisterForm = () => {
+  console.log('활동 등록하기 클릭') // 나중에 모달 열기 등으로 교체
+}
 
 onMounted(async () => {
   try {
