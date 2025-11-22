@@ -162,17 +162,17 @@ h2 {
   padding: 6px 14px;
   border-radius: 20px;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 300;
 }
 
 .status-pending {
   background-color: #5f7bff;
-  color: #000;
+  color: #fff;
 }
 
 .status-approved {
   background-color: #53a54d;
-  color: #000;
+  color: #fff;
 }
 
 .status-rejected {
