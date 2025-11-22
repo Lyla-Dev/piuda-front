@@ -54,25 +54,25 @@
           <div class="filter-section">
             <h4>단체명</h4>
             <div class="organization-grid">
-              <label><input type="checkbox" v-model="filters.orgs.dft"> 디프트제주</label>
+              <label><input type="checkbox" v-model="filters.orgs.dft"> 디프다제주</label>
               <label><input type="checkbox" v-model="filters.orgs.ocean"> 오션케어</label>
-              <label><input type="checkbox" v-model="filters.orgs.busan"> 봉크젠</label>
+              <label><input type="checkbox" v-model="filters.orgs.busan"> 봉그젠</label>
               <label><input type="checkbox" v-model="filters.orgs.covo"> 유명해양청소봉사단 COVO</label>
               <label><input type="checkbox" v-model="filters.orgs.ssdamsokcho"> 쓰담속초</label>
-              <label><input type="checkbox" v-model="filters.orgs.jigu"> 지구별악수터</label>
-              <label><input type="checkbox" v-model="filters.orgs.sseom"> 쓰좀인</label>
-              <label><input type="checkbox" v-model="filters.orgs.cleanup"> 클린넘시캠페인운동본부</label>
+              <label><input type="checkbox" v-model="filters.orgs.jigu"> 지구별약수터</label>
+              <label><input type="checkbox" v-model="filters.orgs.sseom"> 쓰줍인</label>
+              <label><input type="checkbox" v-model="filters.orgs.cleanup"> 클린낚시캠페인운동본부</label>
               <label><input type="checkbox" v-model="filters.orgs.ecoteam"> 에코팀</label>
-              <label><input type="checkbox" v-model="filters.orgs.ocean_protect"> 해양환경보단 레디</label>
-              <label><input type="checkbox" v-model="filters.orgs.project"> 프로젝트레츠컨</label>
-              <label><input type="checkbox" v-model="filters.orgs.environment"> 한경운동연합</label>
-              <label><input type="checkbox" v-model="filters.orgs.plog"> 플로깅물몰</label>
-              <label><input type="checkbox" v-model="filters.orgs.leader"> 휴먼리더브</label>
+              <label><input type="checkbox" v-model="filters.orgs.ocean_protect"> 해양환경보호단 레디</label>
+              <label><input type="checkbox" v-model="filters.orgs.project"> 프로젝트퀘스천</label>
+              <label><input type="checkbox" v-model="filters.orgs.environment"> 환경운동연합</label>
+              <label><input type="checkbox" v-model="filters.orgs.plog"> 플로깅울릉</label>
+              <label><input type="checkbox" v-model="filters.orgs.leader"> 휴먼인러브</label>
               <label><input type="checkbox" v-model="filters.orgs.plogkorea"> 플로빙코리아</label>
               <label><input type="checkbox" v-model="filters.orgs.bakaji"> 바다키퍼</label>
-              <label><input type="checkbox" v-model="filters.orgs.team"> 팀부수터</label>
+              <label><input type="checkbox" v-model="filters.orgs.team"> 팀부스터</label>
               <label><input type="checkbox" v-model="filters.orgs.jeju"> 제주바당</label>
-              <label><input type="checkbox" v-model="filters.orgs.honey"> 훈디</label>
+              <label><input type="checkbox" v-model="filters.orgs.honey"> 혼디</label>
               <label><input type="checkbox" v-model="filters.orgs.sea"> 다시해봄</label>
               <label><input type="checkbox" v-model="filters.orgs.other"> 개인</label>
             </div>
@@ -302,7 +302,7 @@ onBeforeUnmount(() => {
 .filter-panel {
   background: white;
   border: 1px solid #e0e0e0;
-  border-radius: 12px;
+  border-radius: 20px;
   box-shadow: 0 4px 20px rgba(0,0,0,0.15);
   width: 320px;
   max-height: 0;
@@ -333,20 +333,21 @@ onBeforeUnmount(() => {
 }
 
 .reset-btn {
-  background: #007bff;
-  border: 1px solid #007bff;
+  background: white;
+  border: 1px solid white;
   border-radius: 6px;
   padding: 10px 20px;
   font-size: 14px;
-  color: white;
+  color: #7886C7;
   cursor: pointer;
   transition: all 0.2s ease;
   font-weight: 500;
 }
 
 .reset-btn:hover {
-  background: #0056b3;
-  border-color: #0056b3;
+  background: white;
+  font-weight: 700;
+  text-decoration: underline;
 }
 
 /* 필터 섹션 */
@@ -381,14 +382,16 @@ onBeforeUnmount(() => {
   font-size: 13px;
   color: #666;
   font-weight: 500;
+  font-weight: 400;
 }
 
 .date-input-group input[type="date"] {
-  padding: 8px 10px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+  padding: 4px 10px;
+  border: 1px solid #fff2f2;
+  border-radius: 20px;
   font-size: 13px;
-  background: #f9f9f9;
+  font-weight: bold;
+  background: #fff2f2;
 }
 
 .date-separator {
