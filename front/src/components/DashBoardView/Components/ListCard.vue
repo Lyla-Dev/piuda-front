@@ -166,17 +166,17 @@ h2 {
 }
 
 .status-pending {
-  background-color: #f8b4b4;
+  background-color: #5f7bff;
   color: #000;
 }
 
 .status-approved {
-  background-color: #ffecec;
+  background-color: #53a54d;
   color: #000;
 }
 
 .status-rejected {
-  background-color: #d9d9d9;
+  background-color: #d4d4d4;
   color: #000;
 }
 
@@ -192,7 +192,15 @@ h2 {
   gap: 8px;
 }
 
-.approve-btn,
+.approve-btn {
+  padding: 6px 14px;
+  border-radius: 14px;
+  border: 1px solid #fff;
+  background: #c3dfc1;
+  cursor: pointer;
+  font-size: 16px;
+}
+
 .reject-btn {
   padding: 6px 14px;
   border-radius: 14px;
@@ -204,6 +212,6 @@ h2 {
 
 .approve-btn:hover,
 .reject-btn:hover {
-  background: #e9f5ff;
+  border: 1px solid #000;
 }
 </style>
