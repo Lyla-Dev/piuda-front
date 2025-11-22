@@ -1,242 +1,353 @@
 <template>
-  <div class="map-filter-panel">
-    <section class="filter-section date-range">
-      <h3 class="section-title">날짜 범위</h3>
-      <div class="date-input-group">
-        <div class="date-item">
-          <label for="start-date" class="date-label">시작일</label>
-          <input type="date" id="start-date" v-model="filters.startDate" class="date-input">
+  <div class="filter-container">
+    <!-- 펼쳐지는 패널 -->
+    <div class="filter-panel" :class="{ open: isFilterOpen }">
+      <div class="filter-content">
+        <!-- 날짜 범위 -->
+        <div class="filter-section">
+          <h4>날짜 범위</h4>
+          <div class="date-range-inline">
+            <div class="date-input-group">
+              <label>시작일</label>
+              <input type="date" v-model="localFilters.startDate" />
+            </div>
+            <span class="date-separator">~</span>
+            <div class="date-input-group">
+              <label>종료일</label>
+              <input type="date" v-model="localFilters.endDate" />
+            </div>
+          </div>
         </div>
-        <div class="date-item">
-          <label for="end-date" class="date-label">종료일</label>
-          <input type="date" id="end-date" v-model="filters.endDate" class="date-input">
+
+        <!-- 단체명 -->
+        <div class="filter-section">
+          <h4>단체명</h4>
+          <div class="organization-grid">
+            <label><input type="checkbox" v-model="localFilters.orgs.dft" /> 디프다제주</label>
+            <label><input type="checkbox" v-model="localFilters.orgs.ocean" /> 오션케어</label>
+            <label><input type="checkbox" v-model="localFilters.orgs.busan" /> 봉그젠</label>
+            <label><input type="checkbox" v-model="localFilters.orgs.covo" /> 유명해양청소봉사단 COVO</label>
+            <label><input type="checkbox" v-model="localFilters.orgs.ssdamsokcho" /> 쓰담속초</label>
+            <label><input type="checkbox" v-model="localFilters.orgs.jigu" /> 지구별약수터</label>
+            <label><input type="checkbox" v-model="localFilters.orgs.sseom" /> 쓰줍인</label>
+            <label><input type="checkbox" v-model="localFilters.orgs.cleanup" /> 클린낚시캠페인운동본부</label>
+            <label><input type="checkbox" v-model="localFilters.orgs.ecoteam" /> 에코팀</label>
+            <label><input type="checkbox" v-model="localFilters.orgs.ocean_protect" /> 해양환경보호단 레디</label>
+            <label><input type="checkbox" v-model="localFilters.orgs.project" /> 프로젝트퀘스천</label>
+            <label><input type="checkbox" v-model="localFilters.orgs.environment" /> 환경운동연합</label>
+            <label><input type="checkbox" v-model="localFilters.orgs.plog" /> 플로깅울릉</label>
+            <label><input type="checkbox" v-model="localFilters.orgs.leader" /> 휴먼인러브</label>
+            <label><input type="checkbox" v-model="localFilters.orgs.plogkorea" /> 플로빙코리아</label>
+            <label><input type="checkbox" v-model="localFilters.orgs.bakaji" /> 바다키퍼</label>
+            <label><input type="checkbox" v-model="localFilters.orgs.team" /> 팀부스터</label>
+            <label><input type="checkbox" v-model="localFilters.orgs.jeju" /> 제주바당</label>
+            <label><input type="checkbox" v-model="localFilters.orgs.honey" /> 혼디</label>
+            <label><input type="checkbox" v-model="localFilters.orgs.sea" /> 다시해봄</label>
+            <label><input type="checkbox" v-model="localFilters.orgs.other" /> 개인</label>
+          </div>
+        </div>
+
+        <!-- 권역 -->
+        <div class="filter-section">
+          <h4>권역</h4>
+          <div class="region-options">
+            <label><input type="checkbox" v-model="localFilters.regions.west" /> 서해</label>
+            <label><input type="checkbox" v-model="localFilters.regions.east" /> 동해</label>
+            <label><input type="checkbox" v-model="localFilters.regions.south" /> 남해</label>
+            <label><input type="checkbox" v-model="localFilters.regions.jeju" /> 제주</label>
+            <label><input type="checkbox" v-model="localFilters.regions.inland" /> 울릉</label>
+          </div>
+        </div>
+
+        <!-- 수거량 -->
+        <div class="filter-section">
+          <h4>수거량</h4>
+          <div class="quantity-options">
+            <label><input type="checkbox" v-model="localFilters.quantity.low" /> 0 ~10</label>
+            <label><input type="checkbox" v-model="localFilters.quantity.mid" /> 10 ~ 50</label>
+            <label><input type="checkbox" v-model="localFilters.quantity.high" /> 50 ~ 100</label>
+            <label><input type="checkbox" v-model="localFilters.quantity.vhigh" /> 100 이상</label>
+          </div>
+        </div>
+
+        <!-- 초기화 버튼 -->
+        <div class="filter-footer">
+          <button class="reset-btn" @click="handleReset">필터 초기화</button>
         </div>
       </div>
-    </section>
-
-    <hr class="section-divider" />
-
-    <section class="filter-section organizations">
-      <h3 class="section-title">단체명</h3>
-      <div class="checkbox-grid">
-        <label v-for="org in organizationList" :key="org" class="checkbox-item">
-          <input type="checkbox" :value="org" v-model="filters.organizations" class="checkbox-input">
-          <span class="label-text">{{ org }}</span>
-        </label>
-        <label class="checkbox-item">
-          <input type="checkbox" value="유명해양정봉사단 COVO" v-model="filters.organizations" class="checkbox-input">
-          <span class="label-text">유명해양정봉사단 <span class="logo-text">COVO</span></span>
-        </label>
-      </div>
-    </section>
-
-    <hr class="section-divider" />
-
-    <section class="filter-section regions">
-      <h3 class="section-title">권역</h3>
-      <div class="checkbox-row">
-        <label v-for="region in regionList" :key="region" class="checkbox-item">
-          <input type="checkbox" :value="region" v-model="filters.regions" class="checkbox-input">
-          <span class="label-text">{{ region }}</span>
-        </label>
-      </div>
-    </section>
-
-    <hr class="section-divider" />
-
-    <section class="filter-section collection-amount">
-      <h3 class="section-title">수거량</h3>
-      <div class="checkbox-row">
-        <label v-for="amount in collectionAmountList" :key="amount.value" class="checkbox-item">
-          <input type="checkbox" :value="amount.value" v-model="filters.collectionAmount" class="checkbox-input">
-          <span class="label-text">{{ amount.label }}</span>
-        </label>
-      </div>
-    </section>
-
-    <hr class="section-divider" />
-
-    <div class="reset-button-container">
-      <button @click="resetFilters" class="reset-button">필터 초기화</button>
     </div>
+
+    <!-- 접기/펼치기 버튼 -->
+    <button class="filter-toggle-btn" @click="toggleFilter">
+      <span class="filter-text">{{ isFilterOpen ? '필터 접기' : '필터 펼치기' }}</span>
+      <span class="toggle-arrow" :class="{ rotated: isFilterOpen }">▲</span>
+    </button>
   </div>
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
+import { ref, watch } from 'vue'
 
-// 1. 필터 데이터 정의
-const filters = ref({
-  startDate: '2025-10-09', // 이미지 기반 초기값 설정
-  endDate: '2025-10-09',   // 이미지 기반 초기값 설정
-  organizations: [],
-  regions: [],
-  collectionAmount: [],
-});
+const props = defineProps({
+  filters: {
+    type: Object,
+    required: true
+  },
+  onReset: {
+    type: Function,
+    required: true
+  }
+})
 
-// 2. 항목 리스트 정의 (데이터는 이미지 기반으로 임의 설정)
-const organizationList = [
-  '디프다제주', '오션케어',
-  '봉그젠',
-  '쓰담속초', '지구별약수터',
-  '쓰줍인', '클린놰시캠페인운동본부',
-  '예코팀', '해양환경보호단 레디',
-  '프로젝트청춘', '환경운동연합',
-  '플로깅올롱', '휴먼인러브',
-  '플로빙코리아', '바다지켜',
-  '팀부스터', '제주바당',
-  '혼디', '다시해봄',
-  '개인'
-];
+const emit = defineEmits(['update:filters'])
 
-const regionList = [
-  '서해', '동해', '남해', '제주', '울릉'
-];
+const isFilterOpen = ref(false)
 
-const collectionAmountList = [
-  { label: '0 ~ 10', value: '0-10' },
-  { label: '10 ~ 50', value: '10-50' },
-  { label: '50 ~ 100', value: '50-100' },
-  { label: '100 이상', value: '100+' }
-];
+const toggleFilter = () => {
+  isFilterOpen.value = !isFilterOpen.value
+}
 
-// 3. 필터 초기화 함수
-const resetFilters = () => {
-  filters.value = {
-    startDate: '', // 초기화 시 빈 값으로 설정
-    endDate: '',
-    organizations: [],
-    regions: [],
-    collectionAmount: [],
-  };
-};
+// 깊은 복사 함수
+const cloneFilters = (f) => JSON.parse(JSON.stringify(f || {}))
 
-// 4. 필터 변경 감지 및 부모 컴포넌트로 이벤트 전달 (옵션)
-// 필터 변경 시 상위 컴포넌트에 알리려면 아래 코드를 사용
-// const emit = defineEmits(['update:filters']);
-// watch(filters, (newFilters) => {
-//   emit('update:filters', newFilters);
-// }, { deep: true });
+// 로컬 상태: 여기만 v-model로 수정
+const localFilters = ref(cloneFilters(props.filters))
 
+// 부모 filters 변경 → 로컬 반영
+watch(
+  () => props.filters,
+  (newVal) => {
+    localFilters.value = cloneFilters(newVal)
+  },
+  { deep: true, immediate: true }
+)
+
+// 로컬 변경 → 부모에 emit (v-model:filters)
+watch(
+  localFilters,
+  (newVal) => {
+    emit('update:filters', newVal)
+  },
+  { deep: true }
+)
+
+// 초기화 버튼
+const handleReset = () => {
+  // 부모 필터 리셋
+  props.onReset()
+  // 부모에서 리셋된 값 기준으로 로컬도 다시 세팅
+  localFilters.value = cloneFilters(props.filters)
+}
 </script>
 
 <style scoped>
-/* 전체 패널 스타일 */
-.map-filter-panel {
-  width: 300px; /* 적절한 너비 설정 */
-  background-color: #f8f8f8;
-  padding: 20px;
-  box-sizing: border-box;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  font-family: Arial, sans-serif;
-  color: #333;
+.filter-container {
+  position: absolute;
+  bottom: 60px;
+  left: 80px;
+  z-index: 1000;
+  width: 320px;
 }
 
-/* 섹션 스타일 */
+/* 패널: 처음엔 접혀있다가 .open 되면 펼쳐짐 */
+.filter-panel {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  width: 320px;
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.3s ease;
+  margin-bottom: 8px;
+}
+
+.filter-panel.open {
+  max-height: calc(100vh - 250px);
+  opacity: 1;
+  transform: translateY(0);
+  overflow-y: auto;
+}
+
+.filter-content {
+  padding: 16px;
+}
+
 .filter-section {
-  margin-bottom: 20px;
+  margin-bottom: 14px;
 }
 
-.section-title {
-  font-size: 1.1em;
-  font-weight: bold;
-  margin-bottom: 15px;
+.filter-section h4 {
+  margin: 0 0 6px 0;
+  font-size: 15px;
+  font-weight: 600;
   color: #333;
+  padding-bottom: 4px;
+  border-bottom: 1px solid #e0e0e0;
 }
 
-/* 구분선 */
-.section-divider {
-  border: none;
-  border-top: 1px solid #eee;
-  margin: 15px 0;
-}
-
-/* 날짜 범위 */
-.date-input-group {
-  display: flex;
-  justify-content: space-between;
-}
-
-.date-item {
-  display: flex;
-  flex-direction: column;
-  width: 48%;
-}
-
-.date-label {
-  font-size: 0.9em;
-  color: #666;
-  margin-bottom: 5px;
-}
-
-.date-input {
-  padding: 5px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  background-color: #ffebee;
-  font-size: 0.9em;
-  text-align: center;
-}
-
-/* 체크박스 그리드 (단체명) */
-.checkbox-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px 15px;
-}
-
-/* 체크박스 행 (권역, 수거량) */
-.checkbox-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px 15px;
-}
-
-/* 개별 체크박스 아이템 */
-.checkbox-item {
+/* 필터 토글 버튼 */
+.filter-toggle-btn {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 22px;
+  padding: 12px 20px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   display: flex;
   align-items: center;
-  cursor: pointer;
-  font-size: 0.95em;
-}
-
-.checkbox-input {
-  margin-right: 8px;
-  /* 기본 체크박스 스타일 */
-}
-
-.label-text {
-  /* 라벨 텍스트 스타일 */
+  justify-content: space-between;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  width: 100%;
   white-space: nowrap;
 }
 
-.logo-text {
-  font-weight: bold;
-  color: #007bff; /* COVO 로고 색상 강조 예시 */
+.filter-toggle-btn:hover {
+  background: #f8f9fa;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
-
-/* 필터 초기화 버튼 */
-.reset-button-container {
+.filter-text {
+  flex: 1;
   text-align: center;
-  padding-top: 10px;
 }
 
-.reset-button {
-  background: none;
-  border: none;
+.toggle-arrow {
+  font-size: 12px;
+  color: #666;
+  transition: transform 0.3s ease;
+}
 
-  color: #7886C7;
-  font-size: 1em;
+.toggle-arrow.rotated {
+  transform: rotate(180deg);
+}
+
+/* 나머지 스타일은 그대로 */
+.date-range-inline {
+  display: flex;
+  align-items: end;
+  gap: 8px;
+}
+
+.date-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.date-input-group label {
+  font-size: 13px;
+  color: #666;
+  font-weight: 400;
+}
+
+.date-input-group input[type="date"] {
+  padding: 4px 10px;
+  border: 1px solid #fff2f2;
+  border-radius: 20px;
+  font-size: 13px;
   font-weight: bold;
-  cursor: pointer;
-  padding: 8px 12px;
-  border-radius: 4px;
-  transition: color 0.2s;
+  background: #fff2f2;
 }
 
-.reset-button:hover {
-  color: #4A6ACD;
+.date-separator {
+  font-size: 14px;
+  color: #666;
+  margin: 0 4px;
+  padding-bottom: 4px;
+}
+
+.organization-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px 10px;
+}
+
+.organization-grid label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  color: #555;
+  cursor: pointer;
+  padding: 1px 0;
+}
+
+.organization-grid input[type="checkbox"] {
+  margin: 0;
+  width: 14px;
+  height: 14px;
+}
+
+.region-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+}
+
+.region-options label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: #555;
+  cursor: pointer;
+}
+
+.region-options input[type="checkbox"] {
+  margin: 0;
+  width: 15px;
+  height: 15px;
+}
+
+.quantity-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px 14px;
+}
+
+.quantity-options label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: #555;
+  cursor: pointer;
+}
+
+.quantity-options input[type="checkbox"] {
+  margin: 0;
+  width: 15px;
+  height: 15px;
+}
+
+.filter-footer {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #e0e0e0;
+  text-align: center;
+}
+
+.reset-btn {
+  background: white;
+  border: 1px solid white;
+  border-radius: 6px;
+  padding: 10px 20px;
+  font-size: 14px;
+  color: #7886C7;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+.reset-btn:hover {
+  background: white;
+  font-weight: 700;
+  text-decoration: underline;
 }
 </style>
