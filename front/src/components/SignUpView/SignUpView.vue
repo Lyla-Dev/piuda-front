@@ -3,7 +3,6 @@
   <div class="auth-page">
     <div class="auth-card">
       <h1 class="auth-title">회원가입</h1>
-      
 
       <form @submit.prevent="handleSubmit" class="auth-form">
         <!-- 이름 -->
@@ -18,7 +17,7 @@
           <p v-if="errors.name" class="input-error">{{ errors.name }}</p>
         </div>
 
-        <!-- ⭐ 성별 -->
+        <!-- 성별 -->
         <div class="form-group">
           <label>성별</label>
           <div class="radio-group">
@@ -38,16 +37,31 @@
               />
               여성
             </label>
-            
           </div>
           <p v-if="errors.gender" class="input-error">
             {{ errors.gender }}
           </p>
         </div>
 
+        <!-- 나이 -->
+        <div class="form-group">
+          <label for="age">나이</label>
+          <input
+            id="age"
+            v-model.trim="form.age"
+            type="number"
+            min="1"
+            placeholder="나이를 입력해주세요"
+          />
+          <p v-if="errors.age" class="input-error">{{ errors.age }}</p>
+        </div>
+
         <!-- 이메일 -->
         <div class="form-group">
-          <label for="email">이메일</label>
+          <label for="email">
+            이메일
+            <span class="label-sub">(아이디로 사용될 예정입니다)</span>
+          </label>
           <input
             id="email"
             v-model.trim="form.email"
@@ -81,47 +95,6 @@
           <p v-if="errors.passwordConfirm" class="input-error">
             {{ errors.passwordConfirm }}
           </p>
-        </div>
-
-        <!-- 회원 유형 -->
-        <div class="form-group">
-          <label>회원 유형</label>
-          <div class="radio-group">
-            <label>
-              <input
-                type="radio"
-                value="individual"
-                v-model="form.userType"
-              />
-              일반 시민
-            </label>
-            <label>
-              <input type="radio" value="activist" v-model="form.userType" />
-              활동가 / 자원봉사자
-            </label>
-            <label>
-              <input type="radio" value="org_admin" v-model="form.userType" />
-              단체 관리자
-            </label>
-          </div>
-          <p v-if="errors.userType" class="input-error">
-            {{ errors.userType }}
-          </p>
-        </div>
-
-        <!-- 소속 단체명 (단체 관련 타입일 때만) -->
-        <div
-          class="form-group"
-          v-if="form.userType === 'activist' || form.userType === 'org_admin'"
-        >
-          <label for="orgName">소속 단체명</label>
-          <input
-            id="orgName"
-            v-model.trim="form.orgName"
-            type="text"
-            placeholder="예: 바다살리기네트워크 부산지부"
-          />
-          <p v-if="errors.orgName" class="input-error">{{ errors.orgName }}</p>
         </div>
 
         <!-- 연락처 (선택) -->
@@ -179,24 +152,22 @@ import { reactive, ref } from 'vue'
 
 const form = reactive({
   name: '',
-  gender: '',              
+  gender: '',
+  age: '',
   email: '',
   password: '',
   passwordConfirm: '',
-  userType: '',
-  orgName: '',
   phone: '',
   agreeTerms: false,
 })
 
 const errors = reactive({
   name: '',
-  gender: '',              
+  gender: '',
+  age: '',
   email: '',
   password: '',
   passwordConfirm: '',
-  userType: '',
-  orgName: '',
   agreeTerms: '',
 })
 
@@ -206,7 +177,7 @@ const submitError = ref('')
 const validate = () => {
   let valid = true
 
-  // 모든 에러 초기화
+  // 에러 초기화
   Object.keys(errors).forEach((key) => {
     errors[key] = ''
   })
@@ -216,9 +187,16 @@ const validate = () => {
     valid = false
   }
 
-  // ⭐ 성별 필수 체크
   if (!form.gender) {
     errors.gender = '성별을 선택해주세요.'
+    valid = false
+  }
+
+  if (!form.age) {
+    errors.age = '나이를 입력해주세요.'
+    valid = false
+  } else if (!/^\d+$/.test(form.age) || Number(form.age) <= 0) {
+    errors.age = '올바른 나이를 입력해주세요.'
     valid = false
   }
 
@@ -246,19 +224,6 @@ const validate = () => {
     valid = false
   }
 
-  if (!form.userType) {
-    errors.userType = '회원 유형을 선택해주세요.'
-    valid = false
-  }
-
-  if (
-    (form.userType === 'activist' || form.userType === 'org_admin') &&
-    !form.orgName
-  ) {
-    errors.orgName = '소속 단체명을 입력해주세요.'
-    valid = false
-  }
-
   if (!form.agreeTerms) {
     errors.agreeTerms = '약관에 동의해야 회원가입이 가능합니다.'
     valid = false
@@ -278,11 +243,10 @@ const handleSubmit = async () => {
     /*
     await axios.post('/api/auth/register', {
       name: form.name,
-      gender: form.gender,   // 
+      gender: form.gender,
+      age: Number(form.age),
       email: form.email,
       password: form.password,
-      userType: form.userType,
-      orgName: form.orgName || null,
       phone: form.phone || null,
     })
     */
@@ -303,40 +267,35 @@ const handleSubmit = async () => {
   align-items: center;
   justify-content: center;
   background: #f4f7fb;
-  padding: 24px;
+  padding: 32px;
 }
 
 .auth-card {
   width: 100%;
-  max-width: 480px;
+  max-width: 560px; /* 🔹 조금 더 넓게 */
   background: #ffffff;
   border-radius: 18px;
   box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
-  padding: 32px 28px 28px;
+  padding: 36px 36px 32px;
 }
 
 .auth-title {
-  font-size: 24px;
+  font-size: 26px;
   font-weight: 700;
-  margin-bottom: 4px;
-}
-
-.auth-subtitle {
-  font-size: 14px;
-  color: #6b7280;
-  margin-bottom: 20px;
+  margin-bottom: 18px;
+  text-align: left;
 }
 
 .auth-form {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 18px; /* 🔹 필드 간 간격 조금 더 넓게 */
 }
 
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
 
 .form-group label {
@@ -345,13 +304,21 @@ const handleSubmit = async () => {
   color: #374151;
 }
 
+.label-sub {
+  font-size: 12px;
+  font-weight: 400;
+  color: #6b7280;
+  margin-left: 4px;
+}
+
 .form-group input[type='text'],
 .form-group input[type='email'],
 .form-group input[type='password'],
-.form-group input[type='tel'] {
+.form-group input[type='tel'],
+.form-group input[type='number'] {
   border-radius: 10px;
   border: 1px solid #d1d5db;
-  padding: 10px 12px;
+  padding: 12px 14px; 
   font-size: 14px;
   outline: none;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
@@ -365,8 +332,8 @@ const handleSubmit = async () => {
 .radio-group {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px 16px;
-  font-size: 13px;
+  gap: 12px 20px;
+  font-size: 14px;
 }
 
 .radio-group label {
@@ -381,6 +348,7 @@ const handleSubmit = async () => {
   gap: 8px;
   font-size: 13px;
   color: #4b5563;
+  line-height: 1.4;
 }
 
 .checkbox-group input[type='checkbox'] {
@@ -399,11 +367,11 @@ const handleSubmit = async () => {
 }
 
 .submit-btn {
-  margin-top: 6px;
+  margin-top: 10px;
   width: 100%;
   border-radius: 999px;
   border: none;
-  padding: 11px 14px;
+  padding: 12px 16px;
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
@@ -429,7 +397,7 @@ const handleSubmit = async () => {
 }
 
 .helper-text {
-  margin-top: 8px;
+  margin-top: 12px;
   font-size: 13px;
   color: #6b7280;
   text-align: center;
