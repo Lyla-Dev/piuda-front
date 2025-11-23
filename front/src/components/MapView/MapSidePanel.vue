@@ -1,6 +1,7 @@
 <!-- src/components/MapView/MapSidePanel.vue -->
 <template>
-  <aside class="map-side-panel" :class="{ 'is-open': isOpen }">
+  <aside class="map-side-panel is-open">
+
     <div class="panel-inner">
       <!-- 헤더 -->
       <header class="panel-header">
@@ -17,7 +18,7 @@
           </p>
         </div>
 
-        <button class="panel-close-btn" @click="$emit('close')">×</button>
+    
       </header>
 
       <div class="panel-scroll">
@@ -26,7 +27,6 @@
           <h3 class="section-title">활동 정보</h3>
 
           <ul class="stats-list">
-  <!-- 최근 활동 -->
   <!-- 최근 활동 -->
 <li class="stats-item">
   <span class="stats-icon">
@@ -97,13 +97,6 @@
 </ul>
 
 
-          <button
-            class="register-btn"
-            type="button"
-            @click="$emit('register-activity', pinDetail)"
-          >
-            활동 등록하기
-          </button>
         </section>
 
         <!-- 활동 후기 -->
