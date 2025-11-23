@@ -1,6 +1,6 @@
 <!-- src/components/MapView/MapSidePanel.vue -->
 <template>
-  <aside class="map-side-panel is-open">
+  <aside class="map-side-panel" :class="{ 'is-open': isOpen }">
 
     <div class="panel-inner">
       <!-- 헤더 -->
