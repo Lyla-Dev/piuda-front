@@ -7,18 +7,18 @@
     </div>
 
     <div class="gallery-container">
-      <div class="big-image-wrapper" v-if="mainImage">
+      <button class="big-image-wrapper" v-if="mainImage">
         <img :src="mainImage" alt="main" class="big-image" />
-      </div>
+      </button>
 
       <div class="small-grid">
-        <div
+        <button
           v-for="(img, index) in subImages"
           :key="index"
           class="small-image-wrapper"
         >
           <img :src="img" class="small-image" />
-        </div>
+        </button>
       </div>
     </div>
   </div>
@@ -93,6 +93,16 @@ const subImages = computed(() => images.slice(-5, -1).reverse());
   width: 125px;
   height: 128px;
   overflow: hidden;
+}
+
+.big-image-wrapper,
+.small-image-wrapper {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  appearance: none; /* ⭐ Safari, iOS 기본 버튼 스타일 제거 */
+  -webkit-appearance: none;
 }
 
 .small-image {
