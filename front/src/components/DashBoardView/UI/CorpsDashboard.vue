@@ -30,13 +30,10 @@
     />
 
     <!-- 추후 api 연결 시 사용 -->
-    <!-- 로딩 중 -->
     <!-- <div v-if="loading">로딩 중...</div> -->
 
-    <!-- 에러 발생 -->
     <!-- <div v-else-if="error">리뷰 목록을 불러오지 못했습니다.</div> -->
 
-    <!-- 데이터 표시 -->
     <!-- <ListCard
       v-else
       title="작성된 후기"
@@ -116,7 +113,7 @@ export default {
 
   // async created() {
   //   try {
-  //     // 🔥 실제 API URL로 변경하면 됨
+  //     //실제 API URL로 변경
   //     const response = await fetch("/api/corps/reviews");
 
   //     if (!response.ok) {

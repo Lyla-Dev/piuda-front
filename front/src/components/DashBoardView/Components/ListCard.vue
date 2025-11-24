@@ -11,7 +11,6 @@
           <th v-for="col in columns" :key="col.label">
             {{ col.label }}
           </th>
-          <!-- 오른쪽 버튼 칼럼 헤더는 비워둠 -->
           <th v-if="showActionCol"></th>
         </tr>
       </thead>
@@ -19,7 +18,6 @@
       <tbody>
         <tr v-for="(row, index) in contents" :key="index">
           <td v-for="col in columns" :key="col.key" class="cell">
-            <!-- 상태 칩 -->
             <span
               v-if="col.key === 'status'"
               :class="['status-chip', statusClass(row[col.key])]"
@@ -27,7 +25,6 @@
               {{ statusLabel(row[col.key]) }}
             </span>
 
-            <!-- 승인/거절 버튼 -->
             <div v-else-if="col.key === 'action'" class="action-col">
               <div
                 v-if="row.status === ReportStatus.PENDING && !row._resolved"
@@ -39,7 +36,6 @@
               <div v-else></div>
             </div>
 
-            <!-- 일반 텍스트 -->
             <span v-else>
               {{ row[col.key] }}
             </span>
@@ -64,7 +60,6 @@ export default {
     columns: Array,
     contents: Array,
     editable: Boolean,
-    // 이 카드에서 우측 버튼 칼럼을 쓸지 여부 (시민 제보에만 true)
     showActionCol: {
       type: Boolean,
       default: false,
@@ -75,7 +70,7 @@ export default {
 
   data() {
     return {
-      ReportStatus, // 템플릿에서 직접 사용
+      ReportStatus,
     };
   },
 
@@ -89,14 +84,14 @@ export default {
 
     approve(row) {
       this.$emit("approve", row);
-      row._resolved = true; // 버튼 숨기기
-      row.status = ReportStatus.APPROVED; // 상태 변경
+      row._resolved = true;
+      row.status = ReportStatus.APPROVED;
     },
 
     reject(row) {
       this.$emit("reject", row);
-      row._resolved = true; // 버튼 숨기기
-      row.status = ReportStatus.REJECTED; // 상태 변경
+      row._resolved = true;
+      row.status = ReportStatus.REJECTED;
     },
   },
 };

@@ -8,7 +8,7 @@ import ActivityList from "@/components/ActivityView/ActivityList.vue";
 import ReviewForm from "@/components/ActivityView/ReviewFormView.vue";
 import LoginView from "@/components/LoginView/LoginView.vue";
 import ReviewList from "@/components/ActivityView/ReviewList.vue";
-import MyDashboard from "@/components/DashBoardView/UI/MyDashboard.vue";
+import MyDashboard from "@/components/DashBoardView/UI/MyDashboard/MyDashboard.vue";
 import CorpsDashboard from "@/components/DashBoardView/UI/CorpsDashboard.vue";
 import ManagerDashboard from "@/components/DashBoardView/UI/ManagerDashboard.vue";
 
