@@ -61,7 +61,7 @@ export default {
     statusClass(status) {
       return ReportStatusClass[status] || "";
     },
-    // 승인 버튼 클릭 → API 호출
+
     async handleApprove(row) {
       try {
         await fetch(`/api/reports/${row.reportId}/accept`, {
@@ -69,7 +69,6 @@ export default {
           headers: { "Content-Type": "application/json" },
         });
 
-        // UI 업데이트
         row.status = ReportStatus.APPROVED;
         alert("승인 완료!");
       } catch (e) {
@@ -78,7 +77,6 @@ export default {
       }
     },
 
-    // 거절 버튼 클릭 → API 호출
     async handleReject(row) {
       try {
         await fetch(`/api/reports/${row.reportId}/reject`, {
@@ -86,7 +84,6 @@ export default {
           headers: { "Content-Type": "application/json" },
         });
 
-        // UI 업데이트
         row.status = ReportStatus.REJECTED;
         alert("거절 완료!");
       } catch (e) {
@@ -132,9 +129,9 @@ export default {
   // 추후 제보 api 연결 시 사용할 코드
   //     data() {
   //   return {
-  //     notifies: [],       // 처음엔 비워두기
-  //     loading: true,     // 로딩 상태
-  //     error: null        // 에러 처리
+  //     notifies: [],
+  //     loading: true,
+  //     error: null
   //   }
   // },
 
