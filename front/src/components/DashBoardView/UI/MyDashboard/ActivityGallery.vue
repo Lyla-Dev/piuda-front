@@ -6,64 +6,98 @@
       <button class="more-btn">후기 펼쳐보기</button>
     </div>
 
-    <div class="gallery-grid">
-      <img
-        v-for="(img, index) in images"
-        :key="index"
-        :src="img"
-        class="gallery-img"
-        alt="activity image"
-      />
+    <div class="gallery-container">
+      <div class="big-image-wrapper" v-if="mainImage">
+        <img :src="mainImage" alt="main" class="big-image" />
+      </div>
+
+      <div class="small-grid">
+        <div
+          v-for="(img, index) in subImages"
+          :key="index"
+          class="small-image-wrapper"
+        >
+          <img :src="img" class="small-image" />
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { computed } from "vue";
 
-// 추후 API로 교체 가능
-const images = ref([
-  "/assets/activity_main.jpg",
-  "/assets/activity_1.jpg",
-  "/assets/activity_2.jpg",
-  "/assets/activity_3.jpg",
-  "/assets/activity_4.jpg",
-]);
+const images = [
+  new URL("@/assets/reviewImageEx.png", import.meta.url).href,
+  new URL("@/assets/reviewImageEx.png", import.meta.url).href,
+  new URL("@/assets/reviewImageEx.png", import.meta.url).href,
+  new URL("@/assets/reviewImageEx.png", import.meta.url).href,
+  new URL("@/assets/reviewImageEx.png", import.meta.url).href,
+];
+
+const mainImage = computed(() => images.at(-1)); // 최신 1장
+const subImages = computed(() => images.slice(-5, -1).reverse());
 </script>
 
 <style scoped>
 .gallery-card {
   background: #fff;
-  padding: 24px;
-  border-radius: 16px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 25px;
+  border-radius: 30px;
 }
 
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 25px;
 }
 
 .more-btn {
   background: none;
   border: none;
-  font-size: 14px;
-  color: #4b4bff;
+  font-size: 12px;
+  color: #2d336b;
   cursor: pointer;
 }
 
-.gallery-grid {
-  margin-top: 20px;
+.gallery-container {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
+  grid-template-columns: 260px 1fr;
+  gap: 2px;
 }
 
-.gallery-img {
+.big-image-wrapper {
+  width: 260px;
+  height: 260px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.big-image {
   width: 100%;
-  height: 110px;
+  height: 100%;
   object-fit: cover;
-  border-radius: 10px;
+}
+
+.small-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 125px);
+  grid-template-rows: repeat(2, 125x);
+  gap: 2px;
+}
+
+.small-image-wrapper {
+  width: 125px;
+  height: 128px;
+  overflow: hidden;
+}
+
+.small-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 </style>

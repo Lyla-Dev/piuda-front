@@ -1,64 +1,80 @@
 <!-- src/components/MyDashboard/MyProfile.vue -->
 <template>
   <div class="profile-card">
-    <h2>내 프로필</h2>
+    <div class="header">
+      <h2>내 프로필</h2>
+      <button class="edit-btn">프로필 수정</button>
+    </div>
 
-    <div class="profile-wrapper">
-      <img class="profile-img" :src="profileImage" alt="profile" />
+    <div class="profile-content">
+      <ProfileImage :src="profileImage" />
 
       <div class="profile-info">
         <p>• 이름: {{ name }}</p>
         <p>• 활동 시작 날짜: {{ startDate }}</p>
       </div>
     </div>
-
-    <button class="edit-btn">프로필 수정</button>
   </div>
 </template>
 
 <script setup>
 import { ref } from "vue";
+import ProfileImage from "@/components/DashBoardView/Components/CropImage.vue";
 
 // 실제 데이터가 API라면 props로 받을 수도 있음
-const profileImage = ref("/assets/profile_dummy.png");
+const profileImage = ref(
+  new URL("@/assets/profile.jpeg", import.meta.url).href
+);
 const name = ref("이민형");
 const startDate = ref("2025.11.09");
 </script>
 
 <style scoped>
-.profile-card {
-  background: #fff;
-  padding: 24px;
-  border-radius: 16px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 24px;
 }
 
-.profile-wrapper {
+.profile-card {
+  background: #fff;
+  max-width: 100%;
+  padding: 24px;
+  border-radius: 30px;
+
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-.profile-img {
+.profile-content {
   width: 160px;
   height: 160px;
   border-radius: 50%;
   object-fit: cover;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
 }
 
 .profile-info {
+  margin-top: 20px;
   text-align: center;
-  font-size: 16px;
+  font-size: 14px;
+  font-weight: 500;
   margin-bottom: 16px;
+}
+
+.profile-info p {
+  white-space: nowrap;
 }
 
 .edit-btn {
   margin-top: 8px;
   background: none;
   border: none;
-  color: #4b4bff;
+  color: #2d336b;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 12px;
 }
 </style>
