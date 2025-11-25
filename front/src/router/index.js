@@ -11,6 +11,9 @@ import ReviewList from "@/components/ActivityView/ReviewList.vue";
 import MyDashboard from "@/components/DashBoardView/UI/MyDashboard/MyDashboard.vue";
 import CorpsDashboard from "@/components/DashBoardView/UI/CorpsDashboard.vue";
 import ManagerDashboard from "@/components/DashBoardView/UI/ManagerDashboard.vue";
+import SignUpView from "@/components/SignUpView/SignUpView.vue";
+
+
 
 const routes = [
   { path: "/", name: "Home", component: MainView },
@@ -33,6 +36,12 @@ const routes = [
     name: "ManagerDashboard",
     component: ManagerDashboard,
   },
+  {
+  path: "/register",
+  name: "Register",
+  component: SignUpView,
+},
+
 ];
 
 const router = createRouter({
