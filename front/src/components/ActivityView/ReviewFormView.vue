@@ -8,7 +8,6 @@
       <div class="grid grid-3">
         <InputField v-model="form.writer" label="작성자" required placeholder="김OO" />
         <InputField v-model="form.memberCount" label="활동인원 수" type="number" unit="명" required />
-        <InputField v-model="form.org" label="단체명" required placeholder="단체명" />
       </div>
       <InputField v-model="form.title" label="활동 제목" required placeholder="예: 고성 공경리 해변 정화" />
     </section>
@@ -172,7 +171,6 @@ const router = useRouter()
 const form = ref({
   writer: '',
   memberCount: '',
-  org: '',
   title: '',
   date: '',
   placeName: '',
