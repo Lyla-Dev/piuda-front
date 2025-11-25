@@ -152,7 +152,10 @@
 
 <script setup>
 import { reactive, ref } from 'vue'
-// import axios from 'axios' // 실제 API 연결 시 사용
+import { useRouter } from 'vue-router'
+import { authAPI } from '@/api/auth'
+
+const router = useRouter()
 
 const form = reactive({
   name: '',
@@ -264,20 +267,23 @@ const handleSubmit = async () => {
 
   isSubmitting.value = true
   try {
-    // 실제 API 요청 예시
-    /*
-    await axios.post('/api/auth/register', {
+    // 실제 API 호출
+    const result = await authAPI.signup({
       name: form.name,
-      gender: form.gender,
-      age: Number(form.age),
       email: form.email,
       password: form.password,
-      phone: form.phone || null,
+      phone: form.phone
     })
-    */
 
-    alert('회원가입이 완료되었습니다! 🎉 (지금은 더미 동작입니다)')
-  } catch (err) {
+    if (result.success) {
+      alert('회원가입이 완료되었습니다! 🎉\n로그인 페이지로 이동합니다.')
+      // 로그인 페이지로 이동
+      router.push('/login')
+    } else {
+      submitError.value = result.message
+    }
+  } catch (error) {
+    console.error('회원가입 처리 중 오류:', error)
     submitError.value = '회원가입 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.'
   } finally {
     isSubmitting.value = false

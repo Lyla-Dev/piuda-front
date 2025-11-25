@@ -37,10 +37,15 @@ const routes = [
     component: ManagerDashboard,
   },
   {
-  path: "/register",
-  name: "Register",
-  component: SignUpView,
-},
+    path: "/register",
+    name: "Register", 
+    component: SignUpView,
+  },
+  {
+    path: "/signup",
+    name: "SignUp",
+    component: SignUpView,
+  },
 
 ];
 
