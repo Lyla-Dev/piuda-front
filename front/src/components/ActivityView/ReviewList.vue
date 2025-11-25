@@ -1,24 +1,6 @@
 <template>
     <div>
-        <header class="main-header">
-            <div class="header-content">
-                <div class="logo">
-                    바다살리기 네트워크
-                    <span class="logo-sub">KOREA MARINE REGENERATION NETWORK</span>
-                </div>
-                <nav class="main-nav">
-                    <ul>
-                        <li><a href="#">소개</a></li>
-                        <li><a href="#">활동</a></li>
-                        <li><a href="#">해양 지도</a></li>
-                        <li><a href="#">공지</a></li>
-                    </ul>
-                </nav>
-                <div class="login-btn">
-                    <a href="#">Login</a>
-                </div>
-            </div>
-        </header>
+        
 
         <section class="hero-section"></section>
 
@@ -26,12 +8,20 @@
             <h1 class="main-title">활동 후기</h1>
 
             <div class="review-list-wrapper">
-                <div class="review-item" v-for="(review, index) in paginatedReviews" :key="index">
-                    <span class="review-number">{{ totalReviews - (itemsPerPage * (currentPage - 1)) - index }}</span>
+                <div
+                    class="review-item"
+                    v-for="(review, index) in paginatedReviews"
+                    :key="review.id"
+                    @click="goToDetail(review)"
+                >
+                    <span class="review-number">
+                        {{ totalReviews - (itemsPerPage * (currentPage - 1)) - index }}
+                    </span>
                     <span class="review-team">{{ review.team }}</span>
                     <span class="review-activity">{{ review.activity }}</span>
                     <span class="review-info">{{ review.info }}</span>
                 </div>
+
             </div>
 
             <div class="pagination-container" v-if="pageCount > 1">
@@ -55,19 +45,20 @@ export default {
     data() {
         return {
             reviews: [
-                { team: "디프다제주", activity: "해안 쓰레기 줍기 활동", info: "인천 해안 | 2025.10" },
-                { team: "봉그젠", activity: "신진 활동가 양성 프로젝트", info: "제주 해안 | 2025.09" },
-                { team: "쓰담속초", activity: "심해 쓰레기 수거 활동", info: "속초 해안 | 2025.08" },
-                { team: "쓰줍인", activity: "해안 쓰레기 줍기 활동", info: "인천 해안 | 2025.10" },
-                { team: "에코팀", activity: "신진 활동가 양성 프로젝트", info: "제주 해안 | 2025.03" },
-                { team: "오션케어", activity: "심해 쓰레기 수거 활동", info: "인천 해안 | 2025.09" },
-                { team: "지구별막수터", activity: "해안 쓰레기 줍기 활동", info: "제주 해안 | 2025.04" },
-                { team: "팀부스터", activity: "신진 활동가 양성 프로젝트", info: "인천 해안 | 2025.05" },
-                { team: "플로로그코리아", activity: "심해 쓰레기 수거 활동", info: "제주 해안 | 2025.09" },
-                { team: "바다사랑", activity: "해안 정화 캠페인", info: "부산 해안 | 2025.10" },
-                { team: "푸른지구", activity: "신진 활동가 양성 프로젝트", info: "인천 해안 | 2025.11" },
-                { team: "클린오션", activity: "심해 쓰레기 수거 활동", info: "속초 해안 | 2025.11" } // 총 12개
-            ],
+                { id: 1, team: "디프다제주", activity: "해안 쓰레기 줍기 활동", info: "인천 해안 | 2025.10" },
+                { id: 2, team: "봉그젠", activity: "신진 활동가 양성 프로젝트", info: "제주 해안 | 2025.09" },
+                { id: 3, team: "쓰담속초", activity: "심해 쓰레기 수거 활동", info: "속초 해안 | 2025.08" },
+                { id: 4, team: "쓰줍인", activity: "해안 쓰레기 줍기 활동", info: "인천 해안 | 2025.10" },
+                { id: 5, team: "에코팀", activity: "신진 활동가 양성 프로젝트", info: "제주 해안 | 2025.03" },
+                { id: 6, team: "오션케어", activity: "심해 쓰레기 수거 활동", info: "인천 해안 | 2025.09" },
+                { id: 7, team: "지구별막수터", activity: "해안 쓰레기 줍기 활동", info: "제주 해안 | 2025.04" },
+                { id: 8, team: "팀부스터", activity: "신진 활동가 양성 프로젝트", info: "인천 해안 | 2025.05" },
+                { id: 9, team: "플로로그코리아", activity: "심해 쓰레기 수거 활동", info: "제주 해안 | 2025.09" },
+                { id: 10, team: "바다사랑", activity: "해안 정화 캠페인", info: "부산 해안 | 2025.10" },
+                { id: 11, team: "푸른지구", activity: "신진 활동가 양성 프로젝트", info: "인천 해안 | 2025.11" },
+                { id: 12, team: "클린오션", activity: "심해 쓰레기 수거 활동", info: "속초 해안 | 2025.11" }
+                ],
+
             itemsPerPage: 10, // 페이지당 항목 수
             currentPage: 1
         };
@@ -92,8 +83,15 @@ export default {
         setPage(page) {
             this.currentPage = page;
             window.scrollTo({ top: 0, behavior: 'smooth' });
+        },
+        goToDetail(review) {
+            this.$router.push({
+            name: 'ReviewDetail',
+            params: { id: review.id }
+            });
         }
     }
+
 };
 </script>
 
@@ -213,6 +211,7 @@ ul {
     padding: 15px 0;
     border-bottom: 1px solid #eee;
     font-size: 15px;
+    cursor: pointer;
 }
 
 .review-item:last-child {
