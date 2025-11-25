@@ -2,8 +2,8 @@
   <section class="hero">
     <!-- 이미지 슬라이드 -->
     <div class="hero-slider">
-      <div 
-        v-for="(slide, index) in heroSlides" 
+      <div
+        v-for="(slide, index) in heroSlides"
         :key="index"
         class="hero-slide"
         :class="{ active: currentSlide === index }"
@@ -18,11 +18,11 @@
         </div>
       </div>
     </div>
-    
+
     <!-- 슬라이드 인디케이터 -->
     <div class="slide-indicators">
-      <button 
-        v-for="(slide, index) in heroSlides" 
+      <button
+        v-for="(slide, index) in heroSlides"
         :key="index"
         class="indicator"
         :class="{ active: currentSlide === index }"
@@ -31,116 +31,123 @@
     </div>
   </section>
 
-<!-- Mission Section -->
-<section class="mission">
-  <div class="mission-container">
-    <!-- 왼쪽 텍스트 -->
-    <div class="mission-text">
-      <h2>바다를 살리는 한 걸음</h2>
-      <p>
-        바다살리기네트워크는 해양 생태계와<br />
-        생물 다양성 보호를 위해 노력하고 있습니다.<br />
-        작은 행동이 일으키는 변화의 물결에<br />
-        함께 해보아요
-      </p>
-      <button @click="$router.push('/my-dashboard')">
-        <span class="button-text">개인대시보드(테스트용 버튼)</span>
-      </button>
-      <button @click="$router.push('/corps-dashboard')">
-        <span class="button-text">단체대시보드(테스트용 버튼)</span>
-      </button>
-      <button @click="$router.push('/manager-dashboard')">
-        <span class="button-text">관리자대시보드(테스트용 버튼)</span>
-      </button>
+  <!-- Mission Section -->
+  <section class="mission">
+    <div class="mission-container">
+      <!-- 왼쪽 텍스트 -->
+      <div class="mission-text">
+        <h2>바다를 살리는 한 걸음</h2>
+        <p>
+          바다살리기네트워크는 해양 생태계와<br />
+          생물 다양성 보호를 위해 노력하고 있습니다.<br />
+          작은 행동이 일으키는 변화의 물결에<br />
+          함께 해보아요
+        </p>
+        <button @click="$router.push('/my-dashboard')">
+          <span class="button-text">개인대시보드(테스트용 버튼)</span>
+        </button>
+        <button @click="$router.push('/corps-dashboard')">
+          <span class="button-text">단체대시보드(테스트용 버튼)</span>
+        </button>
+        <button @click="$router.push('/manager-dashboard')">
+          <span class="button-text">관리자대시보드(테스트용 버튼)</span>
+        </button>
+      </div>
+
+      <!-- 오른쪽 버튼 2x2 -->
+      <div class="mission-buttons">
+        <button @click="$router.push('/report')">
+          <img src="@/assets/report.png" alt="제보하기" class="button-icon" />
+          <span class="button-text">해양쓰레기<br />제보하기</span>
+        </button>
+
+        <button @click="$router.push('/activity-list')">
+          <img
+            src="@/assets/activitylist.png"
+            alt="활동참가"
+            class="button-icon"
+          />
+          <span class="button-text">활동<br />참가하기</span>
+        </button>
+
+        <button @click="$router.push('/map')">
+          <img src="@/assets/map.png" alt="해양지도" class="button-icon" />
+          <span class="button-text">해양지도<br />바로가기</span>
+        </button>
+
+        <button @click="$router.push('/review-form')">
+          <img
+            src="@/assets/reviewform.png"
+            alt="후기작성"
+            class="button-icon"
+          />
+          <span class="button-text">활동 후기<br />작성하기</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Activity Section -->
+  <section class="activity">
+    <div class="header">
+      <h2>활동 후기 살펴보기</h2>
+      <a href="#" class="see-all">전체 보기</a>
     </div>
 
-    <!-- 오른쪽 버튼 2x2 -->
-    <div class="mission-buttons">
-      <button @click="$router.push('/report')">
-        <img src="@/assets/report.png" alt="제보하기" class="button-icon" />
-        <span class="button-text">해양쓰레기<br />제보하기</span>
-      </button>
-
-      <button @click="$router.push('/activity-list')">
-        <img src="@/assets/activitylist.png" alt="활동참가" class="button-icon" />
-        <span class="button-text">활동<br />참가하기</span>
-      </button>
-
-      <button @click="$router.push('/map')">
-        <img src="@/assets/map.png" alt="해양지도" class="button-icon" />
-        <span class="button-text">해양지도<br />바로가기</span>
-      </button>
-
-      <button @click="$router.push('/review-form')">
-        <img src="@/assets/reviewform.png" alt="후기작성" class="button-icon" />
-        <span class="button-text">활동 후기<br />작성하기</span>
-      </button>
-        </div>
+    <div class="activity-list">
+      <div class="activity-item">
+        <h3><span class="team">디프다 제주</span> 해안 쓰레기 줍기 활동</h3>
+        <p>참여 인원: 20명, 수거량: 20kg</p>
+        <p class="date">인천 해변 | 2025.10</p>
       </div>
-    </section>
-
-
-    <!-- Activity Section -->
-    <section class="activity">
-      <div class="header">
-        <h2>활동 후기 살펴보기</h2>
-        <a href="#" class="see-all">전체 보기</a>
+      <div class="activity-item">
+        <h3><span class="team">봉그젠</span> 신진 활동가 양성 프로젝트</h3>
+        <p>참여 인원: 20명, 수거량: 20kg</p>
+        <p class="date">제주 해변 | 2025.09</p>
       </div>
-
-      <div class="activity-list">
-        <div class="activity-item">
-          <h3><span class="team">디프다 제주</span> 해안 쓰레기 줍기 활동</h3>
-          <p>참여 인원: 20명, 수거량: 20kg</p>
-          <p class="date">인천 해변 | 2025.10</p>
-        </div>
-        <div class="activity-item">
-          <h3><span class="team">봉그젠</span> 신진 활동가 양성 프로젝트</h3>
-          <p>참여 인원: 20명, 수거량: 20kg</p>
-          <p class="date">제주 해변 | 2025.09</p>
-        </div>
-        <div class="activity-item">
-          <h3><span class="team">쓰담 속초</span> 심해 쓰레기 수거 활동</h3>
-          <p>참여 인원: 20명, 수거량: 20kg</p>
-          <p class="date">속초 해변 | 2025.08</p>
-        </div>
+      <div class="activity-item">
+        <h3><span class="team">쓰담 속초</span> 심해 쓰레기 수거 활동</h3>
+        <p>참여 인원: 20명, 수거량: 20kg</p>
+        <p class="date">속초 해변 | 2025.08</p>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <section class="partners">
-      <h2>바다살리기네트워크 소속 단체</h2>
+  <section class="partners">
+    <h2>바다살리기네트워크 소속 단체</h2>
 
-      <div class="carousel">
-        <!-- 왼쪽 화살표 -->
-        <button class="nav prev" @click="prevSlide">‹</button>
+    <div class="carousel">
+      <!-- 왼쪽 화살표 -->
+      <button class="nav prev" @click="prevSlide">‹</button>
 
-        <div class="carousel-window">
-          <div class="carousel-track" :style="trackStyle">
-            <div
-              class="partner-item"
-              v-for="(partner, index) in partners"
-              :key="index"
-            >
-              <img :src="partner.img" :alt="partner.name" />
-              <p>{{ partner.name }}</p>
-            </div>
+      <div class="carousel-window">
+        <div class="carousel-track" :style="trackStyle">
+          <div
+            class="partner-item"
+            v-for="(partner, index) in partners"
+            :key="index"
+          >
+            <img :src="partner.img" :alt="partner.name" />
+            <p>{{ partner.name }}</p>
           </div>
         </div>
-
-        <!-- 오른쪽 화살표 -->
-        <button class="nav next" @click="nextSlide">›</button>
       </div>
-    </section>
 
-    <!-- Footer -->
-    <footer>
-      <p>사단법인 바다살리기네트워크</p>
-      <p>이사장 정재익 | 사무국장 최윤</p>
-      <p>교육번호 444-82-00657 | 주소 서울시 구로구 디지털로32가길 16</p>
-      <p>문의: badanetwork@projectlusaion.com</p>
-      <p class="copyright">
-        Copyright ⓒ 2025 바다살리기네트워크 All rights reserved.
-      </p>
-    </footer>
+      <!-- 오른쪽 화살표 -->
+      <button class="nav next" @click="nextSlide">›</button>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <p>사단법인 바다살리기네트워크</p>
+    <p>이사장 정재익 | 사무국장 최윤</p>
+    <p>교육번호 444-82-00657 | 주소 서울시 구로구 디지털로32가길 16</p>
+    <p>문의: badanetwork@projectlusaion.com</p>
+    <p class="copyright">
+      Copyright ⓒ 2025 바다살리기네트워크 All rights reserved.
+    </p>
+  </footer>
 </template>
 
 <script setup>
@@ -148,36 +155,36 @@ import { ref, computed, onMounted, onBeforeUnmount } from "vue";
 
 // 히어로 슬라이드 데이터
 const heroSlides = [
-  { 
-    image: require("@/assets/1.png"), 
+  {
+    image: require("@/assets/1.png"),
     message: "기록은 흔적이 아니라, 영향력이다.",
-    title: "slide1"
+    title: "slide1",
   },
-  { 
-    image: require("@/assets/2.png"), 
+  {
+    image: require("@/assets/2.png"),
     message: "활동을 남기면, 변화가 시작된다.",
-    title: "slide2"
+    title: "slide2",
   },
-  { 
-    image: require("@/assets/3.png"), 
+  {
+    image: require("@/assets/3.png"),
     message: "데이터는 노력의 증거이고, 영향력의 시작이다.",
-    title: "slide3"
+    title: "slide3",
   },
-  { 
-    image: require("@/assets/4.png"), 
+  {
+    image: require("@/assets/4.png"),
     message: "노력을 남기고, 변화를 만든다.",
-    title: "slide4"
+    title: "slide4",
   },
-  { 
-    image: require("@/assets/5.png"), 
+  {
+    image: require("@/assets/5.png"),
     message: "기록이 쌓이면, 세상이 움직인다.",
-    title: "slide5"
+    title: "slide5",
   },
-  { 
-    image: require("@/assets/6.png"), 
+  {
+    image: require("@/assets/6.png"),
     message: "활동은 순간이지만, 데이터는 증거다.",
-    title: "slide6"
-  }
+    title: "slide6",
+  },
 ];
 
 const currentSlide = ref(0);
@@ -209,8 +216,7 @@ function goToSlide(index) {
 }
 
 function nextSlide() {
-  currentIndex.value =
-    (currentIndex.value + 1) % partners.length;
+  currentIndex.value = (currentIndex.value + 1) % partners.length;
 }
 
 function prevSlide() {
@@ -225,7 +231,7 @@ let heroAutoSlideInterval;
 onMounted(() => {
   // 파트너 슬라이드 자동 진행
   autoSlideInterval = setInterval(nextSlide, 3000);
-  
+
   // 히어로 슬라이드 자동 진행 (4초마다)
   heroAutoSlideInterval = setInterval(nextHeroSlide, 4000);
 });
@@ -235,7 +241,6 @@ onBeforeUnmount(() => {
   clearInterval(heroAutoSlideInterval);
 });
 </script>
-
 
 <style scoped>
 .main-page {
@@ -399,21 +404,21 @@ onBeforeUnmount(() => {
   .mission-container {
     gap: 1.5rem;
   }
-  
+
   .mission-text {
     flex: 0 0 280px;
     min-width: 220px;
     padding-left: 1rem;
   }
-  
+
   .mission-text h2 {
     font-size: 1.8rem;
   }
-  
+
   .mission-text p {
     font-size: 1rem;
   }
-  
+
   .mission-buttons {
     gap: 1rem;
   }
@@ -423,16 +428,16 @@ onBeforeUnmount(() => {
   .mission-container {
     gap: 1rem;
   }
-  
+
   .mission-text {
     flex: 0 0 250px;
     min-width: 200px;
   }
-  
+
   .mission-text h2 {
     font-size: 1.6rem;
   }
-  
+
   .mission-text p {
     font-size: 0.9rem;
     line-height: 1.6;
@@ -443,19 +448,19 @@ onBeforeUnmount(() => {
   .mission {
     padding: 3rem 1rem;
   }
-  
+
   .mission-container {
     flex-wrap: wrap; /* 모바일에서만 세로로 정렬 */
     justify-content: center;
     text-align: center;
   }
-  
+
   .mission-text {
     flex: none;
     width: 100%;
     padding-left: 0;
   }
-  
+
   .mission-buttons {
     flex: none;
     width: 100%;
@@ -497,7 +502,7 @@ onBeforeUnmount(() => {
     font-size: 1.2rem;
     gap: 1rem;
   }
-  
+
   .button-icon {
     width: 56px;
     height: 56px;
@@ -512,7 +517,7 @@ onBeforeUnmount(() => {
     gap: 0.8rem;
     padding: 1rem;
   }
-  
+
   .button-icon {
     width: 48px;
     height: 48px;
@@ -526,7 +531,7 @@ onBeforeUnmount(() => {
     font-size: 1.3rem;
     gap: 1rem;
   }
-  
+
   .button-icon {
     width: 60px;
     height: 60px;

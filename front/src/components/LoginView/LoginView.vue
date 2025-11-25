@@ -35,7 +35,7 @@
       </button>
 
       <div class="link-group">
-        <a href="/register" class="link-item">회원가입</a>
+        <router-link to="/register" class="link-item">회원가입</router-link>
         <span class="link-divider">|</span>
         <a href="/find-password" class="link-item">비밀번호 찾기</a>
       </div>
