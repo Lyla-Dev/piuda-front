@@ -97,15 +97,19 @@
           </p>
         </div>
 
-        <!-- 연락처 (선택) -->
+        <!-- 연락처 -->
         <div class="form-group">
-          <label for="phone">연락처 (선택)</label>
+          <label for="phone">연락처 </label>
           <input
             id="phone"
             v-model.trim="form.phone"
             type="tel"
-            placeholder="010-1234-5678"
+            placeholder="01012345678"
+            @input="handlePhoneInput"
           />
+
+          <p v-if="errors.phone" class="input-error">{{ errors.phone }}</p>
+
         </div>
 
         <!-- 약관 동의 -->
@@ -168,11 +172,18 @@ const errors = reactive({
   email: '',
   password: '',
   passwordConfirm: '',
+  pnone : '',
   agreeTerms: '',
 })
 
 const isSubmitting = ref(false)
 const submitError = ref('')
+
+// 🔹 연락처 입력 시 숫자만 남기고 11자리로 제한
+const handlePhoneInput = (event) => {
+  const onlyNumbers = event.target.value.replace(/\D/g, '') // 숫자만
+  form.phone = onlyNumbers.slice(0, 11)                     // 최대 11자리
+}
 
 const validate = () => {
   let valid = true
@@ -215,12 +226,26 @@ const validate = () => {
     errors.password = '비밀번호는 8자 이상이어야 합니다.'
     valid = false
   }
+  if (!form.phone || !/^\d{11}$/.test(form.phone)) {
+    errors.phone = '연락처를 확인해주세요. (숫자 11자리여야 합니다)'
+    valid = false
+  }
+
+
 
   if (!form.passwordConfirm) {
     errors.passwordConfirm = '비밀번호 확인을 입력해주세요.'
     valid = false
   } else if (form.password !== form.passwordConfirm) {
     errors.passwordConfirm = '비밀번호가 일치하지 않습니다.'
+    valid = false
+  }
+
+  if (!form.phone) {
+    errors.phone = '연락처를 입력해주세요.'
+    valid = false
+  } else if (!/^\d{11}$/.test(form.phone)) {
+    errors.phone = '연락처는 숫자 11자리여야 합니다. (예: 01012345678)'
     valid = false
   }
 
