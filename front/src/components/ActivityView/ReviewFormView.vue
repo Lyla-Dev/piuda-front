@@ -133,7 +133,7 @@
       
       <TurnstileWidget
         ref="turnstileWidget"
-        :site-key="process.env.VUE_APP_TURNSTILE_SITE_KEY"
+        :site-key="turnstileSiteKey"
         theme="light"
         size="normal"
         @token="onTurnstileToken"
@@ -192,6 +192,7 @@ const turnstileToken = ref('')
 const turnstileError = ref('')
 const isSubmitting = ref(false)
 const showTurnstile = ref(false)
+const turnstileSiteKey = process.env.VUE_APP_TURNSTILE_SITE_KEY
 
 // 네이버 지도 API 키
 const clientId = process.env.VUE_APP_NAVER_MAP_CLIENT_ID
