@@ -38,29 +38,65 @@
       <li><router-link to="/info">공지</router-link></li>
     </ul>
 
-    <!-- 로그인 버튼 -->
-    <div class="login">
-      <router-link to="/login">Login</router-link>
+    <!-- 로그인/사용자 정보 -->
+    <div class="auth-section">
+      <div v-if="!isLoggedIn" class="login">
+        <router-link to="/login">Login</router-link>
+      </div>
+      
+      <div v-else class="user-info">
+        <span class="username">{{ currentUser?.email?.split('@')[0] }}님</span>
+        <button @click="logout" class="logout-btn">로그아웃</button>
+      </div>
     </div>
   </nav>
 </template>
 
 <script setup>
-import { ref, watch } from "vue"
-import { useRoute } from "vue-router"
+import { ref, watch, onMounted } from "vue"
+import { useRoute, useRouter } from "vue-router"
+import { authAPI } from '@/api/auth'
 
 const showDropdown = ref(false)
 const route = useRoute()
+const router = useRouter()
 
 const isHome = ref(true) // ✅ 반응형으로 관리
+const isLoggedIn = ref(false)
+const currentUser = ref(null)
+
+// 로그인 상태 확인
+const checkAuthStatus = () => {
+  isLoggedIn.value = authAPI.isLoggedIn()
+  currentUser.value = authAPI.getCurrentUser()
+}
+
+// 로그아웃 처리
+const logout = () => {
+  const result = authAPI.logout()
+  alert(result.message)
+  
+  // 상태 업데이트
+  isLoggedIn.value = false
+  currentUser.value = null
+  
+  // 홈으로 이동
+  router.push('/')
+}
 
 watch(
   () => route.path,
   (newPath) => {
     isHome.value = newPath === "/"
+    // 경로 변경시마다 로그인 상태 확인
+    checkAuthStatus()
   },
   { immediate: true } // 첫 렌더링 시 즉시 적용
 )
+
+onMounted(() => {
+  checkAuthStatus()
+})
 </script>
 
 <style scoped>
@@ -173,14 +209,62 @@ watch(
   opacity: 0;
 }
 
-/* ===== 로그인 버튼 ===== */
+/* ===== 인증 섹션 ===== */
+.auth-section {
+  margin-right: 4rem;
+}
+
+/* 로그인 버튼 */
 .login a {
   color: white;
   text-decoration: none;
   font-weight: 500;
-  margin-right: 4rem;
 }
 .login a:hover {
   color: #cfd8ff;
+}
+
+/* 사용자 정보 */  
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.username {
+  color: white;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.logout-btn {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: 0.4rem 0.8rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.logout-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+/* 고체 배경에서 사용자 정보 스타일 */
+.navbar--solid .username {
+  color: #1a2b6d !important;
+}
+
+.navbar--solid .logout-btn {
+  border-color: rgba(26, 43, 109, 0.3);
+  color: #1a2b6d !important;
+}
+
+.navbar--solid .logout-btn:hover {
+  background: rgba(26, 43, 109, 0.1);
+  border-color: rgba(26, 43, 109, 0.5);
 }
 </style>
