@@ -67,7 +67,8 @@ const renderWidget = () => {
   if (!window.turnstile || isLoaded) return
 
   try {
-    widget.value = window.turnstile.render(widgetId.value, {
+    // CSS 셀렉터로 변경 (#id 형식)
+    widget.value = window.turnstile.render(`#${widgetId.value}`, {
       sitekey: props.siteKey,
       theme: props.theme,
       size: props.size,
