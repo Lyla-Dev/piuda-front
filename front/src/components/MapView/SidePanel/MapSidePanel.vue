@@ -74,7 +74,7 @@ defineEmits(["close", "register-activity"]);
 .panel-scroll {
   flex: 1;
   overflow-y: auto;
-  padding: 12px 22px 24px;
+  padding: 0px 22px 0px;
 }
 
 .stats-value {

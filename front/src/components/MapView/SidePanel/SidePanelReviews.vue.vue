@@ -1,7 +1,6 @@
 <template>
   <section class="section">
     <h3 class="section-title">활동 후기</h3>
-
     <p
       v-if="!props.activityLogs || !props.activityLogs.length"
       class="empty-text"
@@ -10,7 +9,12 @@
     </p>
 
     <ul v-else class="review-list">
-      <li v-for="log in props.activityLogs" :key="log.id" class="review-card">
+      <li
+        v-for="log in sortedLogs"
+        :key="log.reportId"
+        class="review-card"
+        @click="goToReview(log.reportId)"
+      >
         <div class="review-info">
           <h4 class="review-title">{{ log.title }}</h4>
           <p class="review-meta">{{ log.date }} · {{ log.orgName }}</p>
@@ -26,11 +30,25 @@
 </template>
 
 <script setup>
+import { useRouter } from "vue-router";
+import { computed } from "vue";
+
 const props = defineProps({
   activityLogs: {
     type: Array,
     default: () => [],
   },
+});
+
+const router = useRouter();
+const goToReview = (id) => {
+  router.push(`/review/${id}`);
+};
+
+const sortedLogs = computed(() => {
+  return [...props.activityLogs].sort((a, b) => {
+    return new Date(b.date) - new Date(a.date);
+  });
 });
 </script>
 
@@ -60,10 +78,14 @@ const props = defineProps({
   border-radius: 16px;
   padding: 12px 14px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  cursor: pointer; /* 클릭 가능하게 */
+  transition: background 0.15s ease;
 }
-
 .review-card + .review-card {
   margin-top: 12px;
+}
+.review-card:hover {
+  background: #f7f7f7;
 }
 
 .review-info {

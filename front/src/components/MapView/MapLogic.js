@@ -5,6 +5,7 @@ import { ref, reactive, watch } from "vue";
 import redPinImg from "@/assets/redpin.png";
 import bluePinImg from "@/assets/bluepin.png";
 import greenPinImg from "@/assets/greenpin.png";
+import reviewImageEx from "@/assets/reviewImageEx.png";
 
 export function useMapLogic() {
   const map = ref(null);
@@ -210,9 +211,8 @@ export function useMapLogic() {
     try {
       const filterParams = buildFilterParams(filters);
       console.log("Requesting pins with filters:", filterParams); // 디버깅용 로그
-      // pins.value = await fetchPinsWithFilters(filterParams)
-      pins.value = [
-        // 🔵 BLUE — 서울
+      // pins.value = normalizePins(await fetchPinsWithFilters(filterParams));
+      pins.value = normalizePins([
         {
           pinId: 1,
           pinX: 126.9784,
@@ -221,8 +221,6 @@ export function useMapLogic() {
 
           totalTrashKg: 19.5,
           totalTrashL: 11.5,
-          latestActivityDate: "2025-10-29",
-          activityCount: 2,
 
           reports: [
             {
@@ -233,7 +231,7 @@ export function useMapLogic() {
               trashKg: 12.5,
               trashL: 8.0,
               reportContent: null,
-              photoPaths: [],
+              photoPaths: [reviewImageEx],
             },
             {
               reportId: 2,
@@ -243,27 +241,21 @@ export function useMapLogic() {
               trashKg: 7.0,
               trashL: 3.5,
               reportContent: null,
-              photoPaths: [],
+              photoPaths: [reviewImageEx],
             },
           ],
         },
-
-        // 🔴 RED — 부산
         {
           pinId: 2,
           pinX: 129.075,
           pinY: 35.1796,
           pinColor: "RED",
 
-          totalTrashKg: 42.3,
-          totalTrashL: 22.0,
-          latestActivityDate: "2025-10-15",
-          activityCount: 5,
+          totalTrashKg: 0,
+          totalTrashL: 0,
 
           reports: [],
         },
-
-        // GREEN — 제주
         {
           pinId: 3,
           pinX: 126.52,
@@ -272,8 +264,6 @@ export function useMapLogic() {
 
           totalTrashKg: 5.0,
           totalTrashL: 2.0,
-          latestActivityDate: null,
-          activityCount: 0,
 
           reports: [
             {
@@ -284,7 +274,7 @@ export function useMapLogic() {
               trashKg: 12.5,
               trashL: 8.0,
               reportContent: null,
-              photoPaths: [],
+              photoPaths: [reviewImageEx],
             },
             {
               reportId: 2,
@@ -294,11 +284,11 @@ export function useMapLogic() {
               trashKg: 7.0,
               trashL: 3.5,
               reportContent: null,
-              photoPaths: [],
+              photoPaths: [reviewImageEx],
             },
           ],
         },
-      ];
+      ]);
       // console.log("Received pins:", pins.value); // 디버깅용 로그
       renderMarkers();
     } catch (e) {
@@ -321,7 +311,6 @@ export function useMapLogic() {
       mapDataControl: true,
     };
     map.value = new window.naver.maps.Map("naverMap", mapOptions);
-    // 지도 초기화 후 핀 데이터 불러오기
     loadPins();
   };
 
@@ -367,3 +356,30 @@ export function useMapLogic() {
     closeModal,
   };
 }
+
+const getLatestDateFromReports = (reports) => {
+  if (!reports || reports.length === 0) return null;
+
+  const latest = reports
+    .map((r) => new Date(r.reportDate))
+    .sort((a, b) => b - a)[0];
+
+  return latest ? latest.toISOString().split("T")[0] : null;
+};
+
+const getActivityCount = (reports) => {
+  return reports ? reports.length : 0;
+};
+
+const normalizePins = (pinList) => {
+  return pinList.map((pin) => {
+    const latestDate = getLatestDateFromReports(pin.reports);
+    const count = getActivityCount(pin.reports);
+
+    return {
+      ...pin,
+      latestActivityDate: latestDate || pin.latestActivityDate || null,
+      activityCount: count, // ⭐ 자동 계산!
+    };
+  });
+};

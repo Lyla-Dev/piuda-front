@@ -3,7 +3,6 @@
     <h3 class="section-title">활동 정보</h3>
 
     <ul class="stats-list">
-      <!-- 최근 활동 -->
       <li class="stats-item">
         <span class="stats-icon">
           <img :src="peopleIcon" alt="최근 활동" class="stats-img" />
@@ -16,7 +15,6 @@
         </div>
       </li>
 
-      <!-- 누적 수거량 -->
       <li class="stats-item">
         <span class="stats-icon">
           <img :src="clockIcon" alt="누적 수거량" class="stats-img" />
@@ -29,7 +27,6 @@
         </div>
       </li>
 
-      <!-- 누적 활동 횟수 -->
       <li class="stats-item">
         <span class="stats-icon">
           <img :src="sharpIcon" alt="누적 활동 횟수" class="stats-img" />
@@ -62,6 +59,7 @@ const props = defineProps({
 .section-title {
   font-size: 15px;
   font-weight: 700;
+  margin-top: 0px;
   margin-bottom: 12px;
   color: #333;
 }

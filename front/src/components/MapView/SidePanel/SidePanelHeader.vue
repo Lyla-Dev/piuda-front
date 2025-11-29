@@ -84,14 +84,14 @@ const badgeClass = computed(() => {
 }
 
 .badge-red {
-  color: #ff4d4d; /* 빨간색 */
+  color: #ff4d4d;
 }
 
 .badge-blue {
-  color: #6370aa; /* 파란색 */
+  color: #2d336b;
 }
 
 .badge-green {
-  color: #333; /* 검정(또는 진회색) */
+  color: #333;
 }
 </style>

@@ -122,7 +122,7 @@ onBeforeUnmount(() => {
   z-index: 10000;
 }
 
-.pin-info-content {
+/* .pin-info-content {
   background: white;
   border-radius: 16px;
   padding: 24px;
@@ -132,9 +132,9 @@ onBeforeUnmount(() => {
   overflow-y: auto;
   position: relative;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-}
+} */
 
-.close-btn {
+/* .close-btn {
   position: absolute;
   top: 16px;
   right: 16px;
@@ -149,13 +149,13 @@ onBeforeUnmount(() => {
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-}
+} */
 
-.close-btn:hover {
+/* .close-btn:hover {
   background: #f0f0f0;
-}
+} */
 
-.pin-title {
+/* .pin-title {
   margin: 0 0 16px 0;
   font-size: 20px;
   font-weight: 700;
@@ -166,17 +166,17 @@ onBeforeUnmount(() => {
   display: flex;
   flex-direction: column;
   gap: 16px;
-}
+} */
 
-.coords {
+/* .coords {
   padding: 12px;
   background: #f8f9fa;
   border-radius: 8px;
   font-size: 14px;
   line-height: 1.5;
-}
+} */
 
-.notify-content {
+/* .notify-content {
   font-size: 14px;
   line-height: 1.6;
 }
@@ -189,6 +189,6 @@ onBeforeUnmount(() => {
   max-width: 100%;
   max-height: 200px;
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); */
+/* } */
 </style>
