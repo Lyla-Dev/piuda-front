@@ -2,12 +2,6 @@
   <div class="result-card">
     <div class="stat-header">
       <span class="stat-title">{{ title }}</span>
-      <span
-        class="stat-delta"
-        :class="{ positive: delta > 0, negative: delta < 0 }"
-      >
-        {{ delta > 0 ? `+${delta}%` : `${delta}%` }}
-      </span>
     </div>
 
     <div class="stat-result">{{ result }}개</div>
@@ -46,29 +40,16 @@ export default {
 
 .stat-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
 }
 
 .stat-title {
-  font-size: 14px;
+  font-size: 16px;
   color: #444;
 }
 
-.stat-delta {
-  font-size: 12px;
-}
-
-.stat-delta.positive {
-  color: #ff0000;
-}
-
-.stat-delta.negative {
-  color: #0000ff;
-}
-
 .stat-result {
-  font-size: 28px;
+  font-size: 30px;
   font-weight: 600;
   margin-top: 15px;
   color: #2d336b;

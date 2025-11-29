@@ -292,7 +292,7 @@ const initializeMap = () => {
   })
 }
 
-const dateOptions = Array.from({ length: 14 }).map((_, i) => {
+const dateOptions = Array.from({ length: 60 }).map((_, i) => {
   const d = new Date()
   d.setDate(d.getDate() - i)
   return d.toISOString().slice(0, 10)
