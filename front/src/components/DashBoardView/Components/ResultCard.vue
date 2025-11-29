@@ -4,7 +4,7 @@
       <span class="stat-title">{{ title }}</span>
     </div>
 
-    <div class="stat-result">{{ result }}개</div>
+    <div class="stat-result">{{ result }}{{ unit }}</div>
   </div>
 </template>
 
@@ -23,6 +23,10 @@ export default {
     result: {
       type: Number,
       required: true,
+    },
+    unit: {
+      type: String,
+      default: '개',
     },
   },
 };
