@@ -1,9 +1,9 @@
 <template>
   <div class="map-container">
     <div id="naverMap" class="map"></div>
-    
+
     <!-- 핀 정보 모달 -->
-    <div v-if="selectedPin" class="pin-info-modal" @click="closeModal">
+    <!-- <div v-if="selectedPin" class="pin-info-modal" @click="closeModal">
       <div class="pin-info-content" @click.stop>
         <button class="close-btn" @click="closeModal">×</button>
         <h3 class="pin-title">
@@ -28,37 +28,27 @@
           </div>
         </div>
       </div>
-    </div>
+    </div> -->
 
     <MapSidePanel
-  :is-open="!!selectedPin"
-  :pin-detail="selectedPin"
-  :activity-logs="[]"
-  @close="closeModal"
-  @register-activity="openActivityRegisterForm"
-/>
-
-
-
-
+      :is-open="!!selectedPin"
+      :pin-detail="selectedPin"
+      :activity-logs="activityLogs"
+      @close="closeModal"
+      @register-activity="openActivityRegisterForm"
+    />
 
     <!-- 필터 패널 컴포넌트 -->
-    <MapFilterPanel
-      v-model:filters="filters"
-      :on-reset="resetFilters"
-    />
+    <MapFilterPanel v-model:filters="filters" :on-reset="resetFilters" />
   </div>
 </template>
 
 <script setup>
-import { onMounted, onBeforeUnmount } from 'vue'
-import { useMapLogic } from './MapLogic'
-import MapFilterPanel from './MapFilters/MapFilterPanel.vue'
-import MapSidePanel from './MapSidePanel.vue'
+import { computed, onMounted, onBeforeUnmount } from "vue";
+import { useMapLogic } from "./MapLogic";
+import MapFilterPanel from "./MapFilters/MapFilterPanel.vue";
+import MapSidePanel from "./SidePanel/MapSidePanel.vue";
 
-
-
-// MapLogic에서 지도 관련 로직 가져오기
 const {
   map,
   filters,
@@ -66,29 +56,44 @@ const {
   initializeMap,
   resetFilters,
   selectedPin,
-  selectedPinImageUrl,
-  closeModal
-} = useMapLogic()
+  // selectedPinImageUrl,
+  closeModal,
+} = useMapLogic();
 
 // 사이드바 "활동 등록하기" 버튼용 임시 함수
 const openActivityRegisterForm = () => {
-  console.log('활동 등록하기 클릭') // 나중에 모달 열기 등으로 교체
-}
+  console.log("활동 등록하기 클릭"); // 나중에 모달 열기 등으로 교체
+};
+
+const activityLogs = computed(() => {
+  if (!selectedPin.value) return [];
+
+  return (
+    selectedPin.value.reports?.map((r) => ({
+      id: r.reportId,
+      title: r.reportTitle,
+      date: r.reportDate,
+      orgName: r.reportName,
+      description: r.reportContent || "",
+      thumbnailUrl: r.photoPaths?.[0] || null,
+    })) || []
+  );
+});
 
 onMounted(async () => {
   try {
-    await loadNaverMapAPI()
-    initializeMap()
+    await loadNaverMapAPI();
+    initializeMap();
   } catch (error) {
-    console.error('네이버 지도 API 로드 실패:', error)
+    console.error("네이버 지도 API 로드 실패:", error);
   }
-})
+});
 
 onBeforeUnmount(() => {
   if (map.value) {
-    map.value.destroy()
+    map.value.destroy();
   }
-})
+});
 </script>
 
 <style scoped>
@@ -186,5 +191,4 @@ onBeforeUnmount(() => {
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
-
 </style>
