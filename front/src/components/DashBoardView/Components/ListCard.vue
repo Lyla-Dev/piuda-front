@@ -8,7 +8,7 @@
     <table class="list">
       <thead>
         <tr>
-          <th v-for="col in columns" :key="col.label">
+          <th v-for="col in columns" :key="col.label" :style="col.width ? `width: ${col.width}` : ''">
             {{ col.label }}
           </th>
           <th v-if="showActionCol"></th>
@@ -17,7 +17,7 @@
 
       <tbody>
         <tr v-for="(row, index) in contents" :key="index">
-          <td v-for="col in columns" :key="col.key" class="cell">
+          <td v-for="col in columns" :key="col.key" class="cell" :style="col.width ? `width: ${col.width}` : ''">
             <span
               v-if="col.key === 'status'"
               :class="['status-chip', statusClass(row[col.key])]"
@@ -25,15 +25,28 @@
               {{ statusLabel(row[col.key]) }}
             </span>
 
-            <div v-else-if="col.key === 'action'" class="action-col">
-              <div
-                v-if="row.status === ReportStatus.PENDING && !row._resolved"
-                class="action-buttons"
+            <div v-else-if="col.key === 'photo' && actions && actions.length > 0" class="photo-col">
+              <button 
+                v-for="action in actions.filter(a => a.key === 'photo')" 
+                :key="action.key"
+                class="photo-btn"
+                @click="action.action(row)"
               >
-                <button class="approve-btn" @click="approve(row)">승인</button>
-                <button class="reject-btn" @click="reject(row)">거절</button>
+                {{ action.label }}
+              </button>
+            </div>
+
+            <div v-else-if="col.key === 'action' && actions && actions.length > 0" class="action-col">
+              <div class="action-buttons">
+                <button 
+                  v-for="action in actions.filter(a => a.key !== 'photo')" 
+                  :key="action.key"
+                  :class="action.key === 'approve' ? 'approve-btn' : 'reject-btn'"
+                  @click="action.action(row)"
+                >
+                  {{ action.label }}
+                </button>
               </div>
-              <div v-else></div>
             </div>
 
             <span v-else>
@@ -63,6 +76,10 @@ export default {
     showActionCol: {
       type: Boolean,
       default: false,
+    },
+    actions: {
+      type: Array,
+      default: () => [],
     },
   },
 
@@ -190,25 +207,49 @@ h2 {
 }
 
 .approve-btn {
-  padding: 6px 14px;
+  padding: 8px 20px;
   border-radius: 14px;
   border: 1px solid #fff;
   background: #c3dfc1;
   cursor: pointer;
   font-size: 16px;
+  min-width: 70px;
+  white-space: nowrap;
 }
 
 .reject-btn {
-  padding: 6px 14px;
+  padding: 8px 20px;
   border-radius: 14px;
   border: 1px solid #ccc;
   background: white;
   cursor: pointer;
   font-size: 16px;
+  min-width: 70px;
+  white-space: nowrap;
 }
 
 .approve-btn:hover,
 .reject-btn:hover {
   border: 1px solid #000;
+}
+
+.photo-col {
+  text-align: left;
+}
+
+.photo-btn {
+  padding: 6px 14px;
+  border-radius: 14px;
+  border: 1px solid #3b82f6;
+  background: #eff6ff;
+  color: #3b82f6;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.photo-btn:hover {
+  background: #3b82f6;
+  color: white;
 }
 </style>
