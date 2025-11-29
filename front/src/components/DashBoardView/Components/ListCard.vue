@@ -140,11 +140,13 @@ h2 {
   text-align: left;
   padding-bottom: 12px;
   border-bottom: 1px solid #eee;
+  width: 25%;
 }
 
 .list td {
-  padding: 16px 0;
+  padding: 16px 8px;
   border-bottom: 1px solid #f2f2f2;
+  width: 25%;
 }
 
 .list tr:last-child td {
