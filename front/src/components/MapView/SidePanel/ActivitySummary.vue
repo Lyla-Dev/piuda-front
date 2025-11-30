@@ -22,7 +22,7 @@
         <div class="stats-text">
           <span class="stats-label">누적 수거량:</span>
           <span class="stats-value">
-            {{ pinDetail?.totalTrashKg || "-" }} kg
+            {{ trashText }}
           </span>
         </div>
       </li>
@@ -46,12 +46,25 @@
 import peopleIcon from "@/assets/people.png";
 import clockIcon from "@/assets/clock.png";
 import sharpIcon from "@/assets/sharp.png";
+import { computed } from "vue";
 
 const props = defineProps({
   pinDetail: {
     type: Object,
     default: null,
   },
+});
+
+const trashText = computed(() => {
+  const kg = props.pinDetail?.totalTrashKg;
+  const L = props.pinDetail?.totalTrashL;
+
+  if (!kg && !L) return "-";
+  if (kg && L) return `${kg}kg / ${L}L`;
+  if (kg) return `${kg}kg`;
+  if (L) return `${L}L`;
+
+  return "-";
 });
 </script>
 

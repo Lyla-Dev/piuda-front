@@ -5,7 +5,7 @@
 
       <div class="panel-scroll">
         <SidePanelActivityInfo :pin-detail="pinDetail" />
-        <SidePanelReviews :activity-logs="props.activityLogs" />
+        <SidePanelReviews :review-logs="props.reviewLogs" />
       </div>
     </div>
   </aside>
@@ -25,7 +25,7 @@ const props = defineProps({
     type: Object,
     default: null,
   },
-  activityLogs: {
+  reviewLogs: {
     type: Array,
     default: () => [],
   },

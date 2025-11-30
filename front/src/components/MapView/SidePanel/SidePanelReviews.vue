@@ -1,10 +1,7 @@
 <template>
   <section class="section">
     <h3 class="section-title">활동 후기</h3>
-    <p
-      v-if="!props.activityLogs || !props.activityLogs.length"
-      class="empty-text"
-    >
+    <p v-if="!props.reviewLogs || !props.reviewLogs.length" class="empty-text">
       아직 등록된 활동 후기가 없어요.
     </p>
 
@@ -13,7 +10,7 @@
         v-for="log in sortedLogs"
         :key="log.reportId"
         class="review-card"
-        @click="goToReview(log.reportId)"
+        @click="goToReview(log.id)"
       >
         <div class="review-info">
           <h4 class="review-title">{{ log.title }}</h4>
@@ -34,19 +31,19 @@ import { useRouter } from "vue-router";
 import { computed } from "vue";
 
 const props = defineProps({
-  activityLogs: {
+  reviewLogs: {
     type: Array,
     default: () => [],
   },
 });
 
 const router = useRouter();
-const goToReview = (id) => {
-  router.push(`/review/${id}`);
+const goToReview = (reportId) => {
+  router.push(`api/report/${reportId}`);
 };
 
 const sortedLogs = computed(() => {
-  return [...props.activityLogs].sort((a, b) => {
+  return [...props.reviewLogs].sort((a, b) => {
     return new Date(b.date) - new Date(a.date);
   });
 });
@@ -73,13 +70,13 @@ const sortedLogs = computed(() => {
 
 .review-card {
   display: flex;
-  align-items: stretch;
   background: #ffffff;
   border-radius: 16px;
   padding: 12px 14px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-  cursor: pointer; /* 클릭 가능하게 */
+  cursor: pointer;
   transition: background 0.15s ease;
+  align-items: center;
 }
 .review-card + .review-card {
   margin-top: 12px;
@@ -109,8 +106,16 @@ const sortedLogs = computed(() => {
 
 .review-desc {
   font-size: 12px;
-  color: #555;
+  color: #000;
   line-height: 1.45;
+  display: -webkit-box;
+  display: box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  box-orient: vertical;
 }
 
 .review-thumb-wrap {
@@ -119,6 +124,9 @@ const sortedLogs = computed(() => {
   border-radius: 14px;
   overflow: hidden;
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .review-thumb {

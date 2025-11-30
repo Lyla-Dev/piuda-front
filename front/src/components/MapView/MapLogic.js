@@ -1,7 +1,6 @@
 import { ref, reactive, watch } from "vue";
 // import { fetchPinsWithFilters } from "./MapApi";
 
-// 핀 이미지 import
 import redPinImg from "@/assets/redpin.png";
 import bluePinImg from "@/assets/bluepin.png";
 import greenPinImg from "@/assets/greenpin.png";
@@ -76,7 +75,6 @@ export function useMapLogic() {
     });
   };
 
-  // 마커 크기 조정 (선택 시 크게, 해제 시 원래 크기)
   const resizeMarker = (marker, isSelected) => {
     const icon = marker.getIcon();
     if (icon) {
@@ -88,23 +86,18 @@ export function useMapLogic() {
     }
   };
 
-  // 핀 클릭 시 정보 표시
   const onMarkerClick = (pin, marker) => {
-    // 이전 선택된 마커 크기 복원
     if (selectedMarker.value) {
       resizeMarker(selectedMarker.value, false);
     }
 
-    // 새로 선택된 마커 크기 증가
     resizeMarker(marker, true);
 
     selectedPin.value = pin;
     selectedMarker.value = marker;
   };
 
-  // 모달 닫기
   const closeModal = () => {
-    // 선택된 마커 크기 복원
     if (selectedMarker.value) {
       resizeMarker(selectedMarker.value, false);
     }
@@ -113,9 +106,7 @@ export function useMapLogic() {
     selectedMarker.value = null;
   };
 
-  // 지도 위에 마커 표시 함수
   const renderMarkers = () => {
-    // 기존 마커 제거
     markers.value.forEach((marker) => marker.setMap(null));
     markers.value = [];
     if (!map.value) return;
@@ -159,7 +150,6 @@ export function useMapLogic() {
           ...(icon ? { icon } : {}),
         });
 
-        // 마커 클릭 이벤트 추가
         window.naver.maps.Event.addListener(marker, "click", () => {
           onMarkerClick(pin, marker);
         });
@@ -169,21 +159,17 @@ export function useMapLogic() {
     });
   };
 
-  // filters 객체를 API 쿼리 파라미터로 변환
   const buildFilterParams = (filters) => {
     const params = {};
 
-    // 날짜
     if (filters.startDate) params.startDate = filters.startDate;
     if (filters.endDate) params.endDate = filters.endDate;
 
-    // 단체명 (체크된 항목들을 배열로)
     const selectedOrgs = Object.keys(filters.orgs).filter(
       (key) => filters.orgs[key]
     );
     if (selectedOrgs.length > 0) params.organizations = selectedOrgs;
 
-    // 권역 (체크된 항목들을 배열로) - 백엔드 형식에 맞게 매핑
     const regionMapping = {
       west: "WEST_SEA",
       east: "EAST_SEA",
@@ -206,7 +192,6 @@ export function useMapLogic() {
     return params;
   };
 
-  // 핀 데이터 불러오기
   const loadPins = async () => {
     try {
       const filterParams = buildFilterParams(filters);
@@ -230,7 +215,8 @@ export function useMapLogic() {
               reportDate: "2025-10-27",
               trashKg: 12.5,
               trashL: 8.0,
-              reportContent: null,
+              reportContent:
+                "즐거운 시간이었습니다.즐거운 시간이었습니다.즐거운 시간이었습니다.즐거운 시간이었습니다.",
               photoPaths: [reviewImageEx],
             },
             {
@@ -240,7 +226,8 @@ export function useMapLogic() {
               reportDate: "2025-10-29",
               trashKg: 7.0,
               trashL: 3.5,
-              reportContent: null,
+              reportContent:
+                "즐거운 시간이었습니다.즐거운 시간이었습니다.즐거운 시간이었습니다.즐거운 시간이었습니다.즐거운 시간이었습니다.즐거운 시간이었습니다.즐거운 시간이었습니다.",
               photoPaths: [reviewImageEx],
             },
           ],
@@ -273,7 +260,8 @@ export function useMapLogic() {
               reportDate: "2025-10-27",
               trashKg: 12.5,
               trashL: 8.0,
-              reportContent: null,
+              reportContent:
+                "즐거운 시간이었습니다.즐거운 시간이었습니다.즐거운 시간이었습니다.즐거운 시간이었습니다.즐거운 시간이었습니다.즐거운 시간이었습니다.즐거운 시간이었습니다.",
               photoPaths: [reviewImageEx],
             },
             {

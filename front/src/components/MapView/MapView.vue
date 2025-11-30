@@ -33,7 +33,7 @@
     <MapSidePanel
       :is-open="!!selectedPin"
       :pin-detail="selectedPin"
-      :activity-logs="activityLogs"
+      :review-logs="reviewLogs"
       @close="closeModal"
       @register-activity="openActivityRegisterForm"
     />
@@ -65,7 +65,7 @@ const openActivityRegisterForm = () => {
   console.log("활동 등록하기 클릭"); // 나중에 모달 열기 등으로 교체
 };
 
-const activityLogs = computed(() => {
+const reviewLogs = computed(() => {
   if (!selectedPin.value) return [];
 
   return (
