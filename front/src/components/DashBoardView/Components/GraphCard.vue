@@ -133,7 +133,7 @@ const createBarChart = () => {
           beginAtZero: true,
           title: {
             display: true,
-            text: '참여자 수 (명)',
+            text: '활동 횟수',
             font: {
               size: 12
             }
@@ -142,7 +142,7 @@ const createBarChart = () => {
             drawOnChartArea: false,
           },
           ticks: {
-            stepSize: 4,
+            stepSize: 5,
             font: {
               size: 11
             }
