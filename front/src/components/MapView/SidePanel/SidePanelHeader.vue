@@ -4,7 +4,6 @@
       <p class="panel-badge" :class="badgeClass">
         {{ pinTypeText }}
       </p>
-
       <p class="panel-coords" v-if="pinDetail">
         위도: {{ (pinDetail.pinY ?? pinDetail.lat)?.toFixed(3) }}, 경도:
         {{ (pinDetail.pinX ?? pinDetail.lng)?.toFixed(3) }}

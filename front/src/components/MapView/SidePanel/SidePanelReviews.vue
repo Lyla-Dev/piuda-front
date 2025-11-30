@@ -4,7 +4,6 @@
     <p v-if="!props.reviewLogs || !props.reviewLogs.length" class="empty-text">
       아직 등록된 활동 후기가 없어요.
     </p>
-
     <ul v-else class="review-list">
       <li
         v-for="log in sortedLogs"
@@ -17,7 +16,6 @@
           <p class="review-meta">{{ log.date }} · {{ log.orgName }}</p>
           <p class="review-desc">{{ log.description }}</p>
         </div>
-
         <div v-if="log.thumbnailUrl" class="review-thumb-wrap">
           <img class="review-thumb" :src="log.thumbnailUrl" :alt="log.title" />
         </div>

@@ -3,7 +3,7 @@ import redPinImg from "@/assets/redpin.png";
 import bluePinImg from "@/assets/bluepin.png";
 import greenPinImg from "@/assets/greenpin.png";
 import { corpList } from "@/assets/corpList";
-// import { fetchPins } from "./MapApi";
+import { fetchPins } from "./MapApi";
 
 /* ============================================================
    유틸 함수
@@ -192,78 +192,7 @@ export function useMapLogic() {
   /* ---- 핀 로딩 ---- */
   const loadPins = async () => {
     try {
-      rawPins.value = normalizePins([
-        {
-          pinId: 1,
-          pinX: 126.9784,
-          pinY: 37.5665,
-          pinColor: "BLUE",
-          totalTrashKg: 19.5,
-          totalTrashL: 11.5,
-          reports: [
-            {
-              reportId: 1,
-              reportTitle: "서해 정화 활동",
-              reportName: "디프다제주",
-              reportDate: "2025-10-27",
-              trashKg: 12.5,
-              trashL: 8.0,
-              reportContent: "즐거운 시간이었습니다.",
-              photoPaths: [],
-            },
-            {
-              reportId: 2,
-              reportTitle: "서해 해변 클린업",
-              reportName: "쓰담속초",
-              reportDate: "2025-10-10",
-              trashKg: 7.0,
-              trashL: 3.5,
-              reportContent: "즐거운 시간이었습니다.",
-              photoPaths: [],
-            },
-          ],
-        },
-        {
-          pinId: 2,
-          pinX: 129.075,
-          pinY: 35.1796,
-          pinColor: "RED",
-          totalTrashKg: 0,
-          totalTrashL: 0,
-          reports: [],
-        },
-        {
-          pinId: 3,
-          pinX: 126.52,
-          pinY: 33.4996,
-          pinColor: "GREEN",
-          totalTrashKg: 5.0,
-          totalTrashL: 2.0,
-          reports: [
-            {
-              reportId: 1,
-              reportTitle: "서해 정화 활동",
-              reportName: "쓰줍인",
-              reportDate: "2025-10-01",
-              trashKg: 12.5,
-              trashL: 8.0,
-              reportContent: "즐거운 시간이었습니다.",
-              photoPaths: [],
-            },
-            {
-              reportId: 2,
-              reportTitle: "서해 해변 클린업",
-              reportName: "OrgB",
-              reportDate: "2025-10-29",
-              trashKg: 7.0,
-              trashL: 3.5,
-              reportContent: null,
-              photoPaths: [],
-            },
-          ],
-        },
-      ]);
-      // rawPins.value = normalizePins(await fetchPins());
+      rawPins.value = normalizePins(await fetchPins());
       applyFilters();
     } catch (e) {
       console.error("핀 데이터 불러오기 실패:", e);
