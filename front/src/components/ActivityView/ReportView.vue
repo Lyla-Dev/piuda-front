@@ -49,8 +49,37 @@
       />
     </section>
 
+    <!-- 보안 인증 섹션 -->
+    <section class="card" v-if="showTurnstile">
+      <h2 class="card-title">🛡️ 보안 인증</h2>
+      <p class="security-notice">
+        봇 공격 방지를 위한 보안 인증입니다. 아래 체크박스를 클릭해주세요.
+      </p>
+      
+      <TurnstileWidget
+        ref="turnstileWidget"
+        :site-key="turnstileSiteKey"
+        theme="light"
+        size="normal"
+        @token="onTurnstileToken"
+        @error="onTurnstileError"
+      />
+      
+      <div v-if="turnstileError" class="turnstile-error">
+        {{ turnstileError }}
+      </div>
+    </section>
+
     <div class="actions">
-      <button class="primary" @click="submit">해양쓰레기 제보하기</button>
+      <button 
+        class="primary" 
+        @click="submit" 
+        :disabled="isSubmitting"
+        :class="{ 'loading': isSubmitting }"
+      >
+        <span v-if="isSubmitting">제보 중...</span>
+        <span v-else>해양쓰레기 제보하기</span>
+      </button>
     </div>
   </div>
 </template>
@@ -59,6 +88,7 @@
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
 import InputField from '@/components/common/InputField.vue'
+import TurnstileWidget from '@/components/common/TurnstileWidget.vue'
 import http from '@/api/http'
 
 const router = useRouter()
@@ -71,6 +101,14 @@ const coords = ref({ lng: 126.9784, lat: 37.5666 }) // 서울 중심으로 초�
 const map = ref(null)
 const marker = ref(null)
 const isLocationLoading = ref(false)
+
+// Turnstile 관련
+const turnstileWidget = ref(null)
+const turnstileToken = ref('')
+const turnstileError = ref('')
+const isSubmitting = ref(false)
+const showTurnstile = ref(false)
+const turnstileSiteKey = process.env.VUE_APP_TURNSTILE_SITE_KEY
 
 // 네이버 지도 API 키
 const clientId = process.env.VUE_APP_NAVER_MAP_CLIENT_ID
@@ -189,18 +227,55 @@ function loadPreviews(files) {
   })
 }
 
+// Turnstile 이벤트 핸들러
+const onTurnstileToken = (token) => {
+  turnstileToken.value = token
+  turnstileError.value = ''
+}
+
+const onTurnstileError = (error) => {
+  turnstileError.value = error
+  turnstileToken.value = ''
+}
+
 function submit() {
+  if (isSubmitting.value) return
+
   // 사진이 없으면 경고
   if (!previews.value.length) {
     alert('사진을 첨부해주세요.')
     return
   }
 
+  // Turnstile 검증 표시
+  if (!showTurnstile.value) {
+    showTurnstile.value = true
+    alert('봇 방지를 위한 보안 인증을 완료해주세요.')
+    return
+  }
+
+  // Turnstile 토큰 확인
+  if (!turnstileToken.value) {
+    alert('보안 인증을 완료해주세요.')
+    return
+  }
+
+  if (turnstileError.value) {
+    alert('보안 인증 중 오류가 발생했습니다. 다시 시도해주세요.')
+    if (turnstileWidget.value) {
+      turnstileWidget.value.reset()
+    }
+    return
+  }
+
+  isSubmitting.value = true
+
   // API 명세에 맞게 payload 구성
   const payload = {
     x: coords.value.lng,
     y: coords.value.lat,
-    content: form.value.description || ''
+    content: form.value.description || '',
+    turnstileToken: turnstileToken.value
   }
 
   // FormData로 multipart/form-data 구성
@@ -238,7 +313,20 @@ const submitToBackend = async (formData) => {
     router.replace({ name: 'Home' })
   } catch (error) {
     console.error('쓰레기 신고 실패:', error)
-    alert('신고 접수에 실패했습니다. 다시 시도해주세요.')
+    
+    // 봇 검증 실패인 경우
+    if (error.response && error.response.status === 400 && 
+        error.response.data && error.response.data.error === 'Bot verification failed') {
+      alert('보안 인증에 실패했습니다. 다시 시도해주세요.')
+      if (turnstileWidget.value) {
+        turnstileWidget.value.reset()
+      }
+      showTurnstile.value = true
+    } else {
+      alert('신고 접수에 실패했습니다. 다시 시도해주세요.')
+    }
+  } finally {
+    isSubmitting.value = false
   }
 }
 
@@ -352,8 +440,39 @@ onBeforeUnmount(() => {
   font-weight: 700;
   border: none;
   cursor: pointer;
+  transition: all 0.2s ease;
 }
-.primary:hover { filter: brightness(0.95); }
+.primary:hover:not(:disabled) { filter: brightness(0.95); }
+.primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.primary.loading {
+  background: #6b7280;
+}
+
+/* Security Section */
+.security-notice {
+  font-size: 14px;
+  color: #6b7280;
+  text-align: center;
+  margin-bottom: 16px;
+  padding: 12px;
+  background: #f8fafc;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.turnstile-error {
+  color: #dc2626;
+  font-size: 14px;
+  text-align: center;
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+}
 </style>
 
 <style>

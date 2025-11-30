@@ -8,10 +8,13 @@ import ActivityList from "@/components/ActivityView/ActivityList.vue";
 import ReviewForm from "@/components/ActivityView/ReviewFormView.vue";
 import LoginView from "@/components/LoginView/LoginView.vue";
 import ReviewList from "@/components/ActivityView/ReviewList.vue";
-import MyDashboard from "@/components/DashBoardView/UI/MyDashboard.vue";
+import MyDashboard from "@/components/DashBoardView/UI/MyDashboard/MyDashboard.vue";
 import CorpsDashboard from "@/components/DashBoardView/UI/CorpsDashboard.vue";
 import ManagerDashboard from "@/components/DashBoardView/UI/ManagerDashboard.vue";
 import ReviewDetail from "@/components/ActivityView/ReviewDetail.vue"; 
+import SignUpView from "@/components/SignUpView/SignUpView.vue";
+
+
 
 const routes = [
   { path: "/", name: "Home", component: MainView },
@@ -38,6 +41,17 @@ const routes = [
     name: "ManagerDashboard",
     component: ManagerDashboard,
   },
+  {
+    path: "/register",
+    name: "Register", 
+    component: SignUpView,
+  },
+  {
+    path: "/signup",
+    name: "SignUp",
+    component: SignUpView,
+  },
+
 ];
 
 const router = createRouter({

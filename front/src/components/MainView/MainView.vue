@@ -67,7 +67,7 @@
             alt="활동참가"
             class="button-icon"
           />
-          <span class="button-text">활동<br />참가하기</span>
+          <span class="button-text">활동<br />등록하기</span>
         </button>
 
         <button @click="$router.push('/map')">

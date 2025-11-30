@@ -1,6 +1,5 @@
 <template>
   <div id="app">
-    <!-- 상단 네비게이션 -->
     <NavBar />
 
     <main :class="{ 'with-padding': !isHome }">
@@ -10,21 +9,21 @@
 </template>
 
 <script>
-import NavBar from './components/NavBar.vue'
-import { computed } from 'vue'
-import { useRoute } from 'vue-router'
+import NavBar from "./components/NavBar.vue";
+import { computed } from "vue";
+import { useRoute } from "vue-router";
 
 export default {
-  name: 'App',
+  name: "App",
   components: {
-    NavBar
+    NavBar,
   },
   setup() {
-    const route = useRoute()
-    const isHome = computed(() => route.path === '/') // ✅ 홈 여부 판단
-    return { isHome }
-  }
-}
+    const route = useRoute();
+    const isHome = computed(() => route.path === "/");
+    return { isHome };
+  },
+};
 </script>
 
 <style>
@@ -40,7 +39,7 @@ main {
 
 body {
   margin: 0;
-  overflow-x: hidden; /* ✅ 전역에서 가로 스크롤 차단 */
-  font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
+  overflow-x: hidden;
+  font-family: "Pretendard", "Noto Sans KR", sans-serif;
 }
 </style>

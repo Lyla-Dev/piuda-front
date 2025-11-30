@@ -11,7 +11,6 @@ export const ReportStatusLabel = {
   [ReportStatus.REJECTED]: "승인 거절",
 };
 
-// 색상 클래스
 export const ReportStatusClass = {
   [ReportStatus.PENDING]: "status-pending",
   [ReportStatus.APPROVED]: "status-approved",

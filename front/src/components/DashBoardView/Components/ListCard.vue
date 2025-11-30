@@ -8,18 +8,16 @@
     <table class="list">
       <thead>
         <tr>
-          <th v-for="col in columns" :key="col.label">
+          <th v-for="col in columns" :key="col.label" :style="col.width ? `width: ${col.width}` : ''">
             {{ col.label }}
           </th>
-          <!-- 오른쪽 버튼 칼럼 헤더는 비워둠 -->
           <th v-if="showActionCol"></th>
         </tr>
       </thead>
 
       <tbody>
         <tr v-for="(row, index) in contents" :key="index">
-          <td v-for="col in columns" :key="col.key" class="cell">
-            <!-- 상태 칩 -->
+          <td v-for="col in columns" :key="col.key" class="cell" :style="col.width ? `width: ${col.width}` : ''">
             <span
               v-if="col.key === 'status'"
               :class="['status-chip', statusClass(row[col.key])]"
@@ -27,19 +25,30 @@
               {{ statusLabel(row[col.key]) }}
             </span>
 
-            <!-- 승인/거절 버튼 -->
-            <div v-else-if="col.key === 'action'" class="action-col">
-              <div
-                v-if="row.status === ReportStatus.PENDING && !row._resolved"
-                class="action-buttons"
+            <div v-else-if="col.key === 'photo' && actions && actions.length > 0" class="photo-col">
+              <button 
+                v-for="action in actions.filter(a => a.key === 'photo')" 
+                :key="action.key"
+                class="photo-btn"
+                @click="action.action(row)"
               >
-                <button class="approve-btn" @click="approve(row)">승인</button>
-                <button class="reject-btn" @click="reject(row)">거절</button>
-              </div>
-              <div v-else></div>
+                {{ action.label }}
+              </button>
             </div>
 
-            <!-- 일반 텍스트 -->
+            <div v-else-if="col.key === 'action' && actions && actions.length > 0" class="action-col">
+              <div class="action-buttons">
+                <button 
+                  v-for="action in actions.filter(a => a.key !== 'photo')" 
+                  :key="action.key"
+                  :class="action.key === 'approve' ? 'approve-btn' : 'reject-btn'"
+                  @click="action.action(row)"
+                >
+                  {{ action.label }}
+                </button>
+              </div>
+            </div>
+
             <span v-else>
               {{ row[col.key] }}
             </span>
@@ -64,10 +73,13 @@ export default {
     columns: Array,
     contents: Array,
     editable: Boolean,
-    // 이 카드에서 우측 버튼 칼럼을 쓸지 여부 (시민 제보에만 true)
     showActionCol: {
       type: Boolean,
       default: false,
+    },
+    actions: {
+      type: Array,
+      default: () => [],
     },
   },
 
@@ -75,7 +87,7 @@ export default {
 
   data() {
     return {
-      ReportStatus, // 템플릿에서 직접 사용
+      ReportStatus,
     };
   },
 
@@ -89,14 +101,14 @@ export default {
 
     approve(row) {
       this.$emit("approve", row);
-      row._resolved = true; // 버튼 숨기기
-      row.status = ReportStatus.APPROVED; // 상태 변경
+      row._resolved = true;
+      row.status = ReportStatus.APPROVED;
     },
 
     reject(row) {
       this.$emit("reject", row);
-      row._resolved = true; // 버튼 숨기기
-      row.status = ReportStatus.REJECTED; // 상태 변경
+      row._resolved = true;
+      row.status = ReportStatus.REJECTED;
     },
   },
 };
@@ -145,11 +157,13 @@ h2 {
   text-align: left;
   padding-bottom: 12px;
   border-bottom: 1px solid #eee;
+  width: 25%;
 }
 
 .list td {
-  padding: 16px 0;
+  padding: 16px 8px;
   border-bottom: 1px solid #f2f2f2;
+  width: 25%;
 }
 
 .list tr:last-child td {
@@ -193,25 +207,49 @@ h2 {
 }
 
 .approve-btn {
-  padding: 6px 14px;
+  padding: 8px 20px;
   border-radius: 14px;
   border: 1px solid #fff;
   background: #c3dfc1;
   cursor: pointer;
   font-size: 16px;
+  min-width: 70px;
+  white-space: nowrap;
 }
 
 .reject-btn {
-  padding: 6px 14px;
+  padding: 8px 20px;
   border-radius: 14px;
   border: 1px solid #ccc;
   background: white;
   cursor: pointer;
   font-size: 16px;
+  min-width: 70px;
+  white-space: nowrap;
 }
 
 .approve-btn:hover,
 .reject-btn:hover {
   border: 1px solid #000;
+}
+
+.photo-col {
+  text-align: left;
+}
+
+.photo-btn {
+  padding: 6px 14px;
+  border-radius: 14px;
+  border: 1px solid #3b82f6;
+  background: #eff6ff;
+  color: #3b82f6;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.photo-btn:hover {
+  background: #3b82f6;
+  color: white;
 }
 </style>

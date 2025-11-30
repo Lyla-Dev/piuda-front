@@ -20,8 +20,18 @@
           required
         />
 
-        <button type="submit" class="login-button primary">
-          로그인
+        <!-- 에러 메시지 표시 -->
+        <div v-if="errorMessage" class="error-message">
+          {{ errorMessage }}
+        </div>
+
+        <button 
+          type="submit" 
+          class="login-button primary"
+          :disabled="isLoading"
+          :class="{ 'loading': isLoading }"
+        >
+          {{ isLoading ? '로그인 중...' : '로그인' }}
         </button>
       </form>
 
@@ -35,7 +45,7 @@
       </button>
 
       <div class="link-group">
-        <a href="/register" class="link-item">회원가입</a>
+        <router-link to="/signup" class="link-item">회원가입</router-link>
         <span class="link-divider">|</span>
         <a href="/find-password" class="link-item">비밀번호 찾기</a>
       </div>
@@ -43,34 +53,61 @@
   </div>
 </template>
 
-<script>
-// 경로: pages/LoginView.vue에서 components/common/InputField.vue로 접근
-import InputField from '../common/InputField.vue';
+<script setup>
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import InputField from '../common/InputField.vue'
+import { authAPI } from '@/api/auth'
 
-export default {
-  name: 'LoginView',
-  components: {
-    InputField,
-  },
-  data() {
-    return {
-      email: '',
-      password: '',
-    };
-  },
-  methods: {
-    login() {
-      // ❗ 여기에 일반 로그인 API 호출 로직 구현
-      console.log('일반 로그인 시도:', this.email);
-      alert('일반 로그인 기능 구현 필요');
-    },
-    kakaoLogin() {
-      // ❗ 여기에 카카오 OAuth 연동 로직 구현
-      console.log('카카오 로그인 버튼 클릭');
-      alert('카카오 로그인 연동 기능 구현 필요');
-    }
+const router = useRouter()
+
+// 반응형 데이터
+const email = ref('')
+const password = ref('')
+const isLoading = ref(false)
+const errorMessage = ref('')
+
+// 로그인 처리
+const login = async () => {
+  if (isLoading.value) return
+  
+  // 입력값 검증
+  if (!email.value.trim()) {
+    errorMessage.value = '이메일을 입력해주세요.'
+    return
   }
-};
+  
+  if (!password.value.trim()) {
+    errorMessage.value = '비밀번호를 입력해주세요.'
+    return
+  }
+  
+  errorMessage.value = ''
+  isLoading.value = true
+  
+  try {
+    const result = await authAPI.login(email.value.trim(), password.value)
+    
+    if (result.success) {
+      alert('로그인 성공! 메인페이지로 이동합니다.')
+      
+      // 메인페이지로 이동 (history 스택 교체)
+      router.replace({ name: 'Home' })
+    } else {
+      errorMessage.value = result.message
+    }
+  } catch (error) {
+    console.error('로그인 처리 중 오류:', error)
+    errorMessage.value = '로그인 처리 중 오류가 발생했습니다.'
+  } finally {
+    isLoading.value = false
+  }
+}
+
+// 카카오 로그인 (향후 구현)
+const kakaoLogin = () => {
+  alert('카카오 로그인은 향후 구현 예정입니다.')
+}
 </script>
 
 <style scoped>
@@ -123,10 +160,32 @@ export default {
   background-color: #007bff; 
   color: white;
   font-weight: bold;
+  transition: all 0.2s ease;
 }
 
-.login-button.primary:hover {
+.login-button.primary:hover:not(:disabled) {
   background-color: #0056b3;
+}
+
+.login-button.primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.login-button.primary.loading {
+  background-color: #6c757d;
+}
+
+/* 에러 메시지 */
+.error-message {
+  color: #dc3545;
+  font-size: 14px;
+  text-align: center;
+  padding: 8px 12px;
+  background: #f8d7da;
+  border: 1px solid #f5c6cb;
+  border-radius: 6px;
+  margin-bottom: 10px;
 }
 
 /* 구분선 스타일 */
