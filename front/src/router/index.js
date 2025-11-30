@@ -11,6 +11,7 @@ import ReviewList from "@/components/ActivityView/ReviewList.vue";
 import MyDashboard from "@/components/DashBoardView/UI/MyDashboard/MyDashboard.vue";
 import CorpsDashboard from "@/components/DashBoardView/UI/CorpsDashboard.vue";
 import ManagerDashboard from "@/components/DashBoardView/UI/ManagerDashboard.vue";
+import ReviewDetail from "@/components/ActivityView/ReviewDetail.vue"; 
 import SignUpView from "@/components/SignUpView/SignUpView.vue";
 
 
@@ -26,6 +27,10 @@ const routes = [
   { path: "/review-form", name: "ReviewForm", component: ReviewForm },
   { path: "/review-list", name: "ReviewList", component: ReviewList },
   { path: "/my-dashboard", name: "MyDashboard", component: MyDashboard },
+  { path: "/review/:id", name: "ReviewDetail", component: ReviewDetail, props: true },
+
+
+  
   {
     path: "/corps-dashboard",
     name: "CorpsDashboard",

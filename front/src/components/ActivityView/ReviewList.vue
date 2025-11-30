@@ -47,51 +47,57 @@
 
 <script>
 export default {
-  name: 'ReviewList',
-  data() {
-    return {
-      reviews: [
-        { team: "디프다제주", activity: "해안 쓰레기 줍기 활동", info: "인천 해안 | 2025.10" },
-        { team: "봉그젠", activity: "신진 활동가 양성 프로젝트", info: "제주 해안 | 2025.09" },
-        { team: "쓰담속초", activity: "심해 쓰레기 수거 활동", info: "속초 해안 | 2025.08" },
-        { team: "쓰줍인", activity: "해안 쓰레기 줍기 활동", info: "인천 해안 | 2025.10" },
-        { team: "에코팀", activity: "신진 활동가 양성 프로젝트", info: "제주 해안 | 2025.03" },
-        { team: "오션케어", activity: "심해 쓰레기 수거 활동", info: "인천 해안 | 2025.09" },
-        { team: "지구별막수터", activity: "해안 쓰레기 줍기 활동", info: "제주 해안 | 2025.04" },
-        { team: "팀부스터", activity: "신진 활동가 양성 프로젝트", info: "인천 해안 | 2025.05" },
-        { team: "플로로그코리아", activity: "심해 쓰레기 수거 활동", info: "제주 해안 | 2025.09" },
-        { team: "바다사랑", activity: "해안 정화 캠페인", info: "부산 해안 | 2025.10" },
-        { team: "푸른지구", activity: "신진 활동가 양성 프로젝트", info: "인천 해안 | 2025.11" },
-        { team: "클린오션", activity: "심해 쓰레기 수거 활동", info: "속초 해안 | 2025.11" }
-      ],
-      itemsPerPage: 10,
-      currentPage: 1
-    };
-  },
-  computed: {
-    totalReviews() {
-      return this.reviews.length;
+    name: 'ReviewList', // 파일 이름에 맞게 ReviewList로 설정
+    data() {
+        return {
+            reviews: [
+                { id: 1, team: "디프다제주", activity: "해안 쓰레기 줍기 활동", info: "인천 해안 | 2025.10" },
+                { id: 2, team: "봉그젠", activity: "신진 활동가 양성 프로젝트", info: "제주 해안 | 2025.09" },
+                { id: 3, team: "쓰담속초", activity: "심해 쓰레기 수거 활동", info: "속초 해안 | 2025.08" },
+                { id: 4, team: "쓰줍인", activity: "해안 쓰레기 줍기 활동", info: "인천 해안 | 2025.10" },
+                { id: 5, team: "에코팀", activity: "신진 활동가 양성 프로젝트", info: "제주 해안 | 2025.03" },
+                { id: 6, team: "오션케어", activity: "심해 쓰레기 수거 활동", info: "인천 해안 | 2025.09" },
+                { id: 7, team: "지구별막수터", activity: "해안 쓰레기 줍기 활동", info: "제주 해안 | 2025.04" },
+                { id: 8, team: "팀부스터", activity: "신진 활동가 양성 프로젝트", info: "인천 해안 | 2025.05" },
+                { id: 9, team: "플로로그코리아", activity: "심해 쓰레기 수거 활동", info: "제주 해안 | 2025.09" },
+                { id: 10, team: "바다사랑", activity: "해안 정화 캠페인", info: "부산 해안 | 2025.10" },
+                { id: 11, team: "푸른지구", activity: "신진 활동가 양성 프로젝트", info: "인천 해안 | 2025.11" },
+                { id: 12, team: "클린오션", activity: "심해 쓰레기 수거 활동", info: "속초 해안 | 2025.11" }
+                ],
+
+            itemsPerPage: 10, // 페이지당 항목 수
+            currentPage: 1
+        };
     },
+  
+  computed: {
+  totalReviews() {
+    return this.reviews.length;
+  },
     pageCount() {
       return Math.ceil(this.totalReviews / this.itemsPerPage);
     },
-    paginatedReviews() {
-      const start = (this.currentPage - 1) * this.itemsPerPage;
-      const end = start + this.itemsPerPage;
-      return this.reviews.slice().reverse().slice(start, end);
-    }
-  },
-  methods: {
-    setPage(page) {
-      this.currentPage = page;
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    },
-    goToDetail(review) {
-      // TODO: 여기 너 원래 쓰던 라우터 로직 넣으면 됨
-      // 예: this.$router.push({ name: 'ReviewDetail', params: { id: review.id } });
-      console.log('goToDetail:', review);
-    }
+  paginatedReviews() {
+    const start = (this.currentPage - 1) * this.itemsPerPage;
+    const end = start + this.itemsPerPage;
+    return this.reviews.slice().reverse().slice(start, end);
   }
+},
+  
+  
+  methods: {
+      setPage(page) {
+          this.currentPage = page;
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+      },
+      goToDetail(review) {
+          this.$router.push({
+          name: 'ReviewDetail',
+          params: { id: review.id }
+          });
+      }
+  }
+
 };
 </script>
 
@@ -182,13 +188,25 @@ export default {
   color: #666;
 }
 
-/* Pagination */
+/* 🚩 후기 아이템 스타일 */
+.review-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 1px solid #eee;
+    font-size: 15px;
+    cursor: pointer;
+}
+  
+  /* Pagination */
 .pagination {
   display: flex;
   justify-content: center;
   gap: 8px;
   margin-top: 20px;
 }
+
 
 .page-btn {
   min-width: 32px;
