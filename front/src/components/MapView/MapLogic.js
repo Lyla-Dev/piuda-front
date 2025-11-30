@@ -1,52 +1,109 @@
 import { ref, reactive, watch } from "vue";
-// import { fetchPinsWithFilters } from "./MapApi";
-
 import redPinImg from "@/assets/redpin.png";
 import bluePinImg from "@/assets/bluepin.png";
 import greenPinImg from "@/assets/greenpin.png";
-import reviewImageEx from "@/assets/reviewImageEx.png";
+import { corpList } from "@/assets/corpList";
+// import { fetchPins } from "./MapApi";
+
+/* ============================================================
+   유틸 함수
+============================================================ */
+
+const makeSlug = (name) =>
+  name
+    .replace(/\s+/g, "")
+    .replace(/[^a-zA-Z0-9가-힣]/g, "")
+    .toLowerCase();
+
+const getLatestDateFromReports = (reports) => {
+  if (!reports || reports.length === 0) return null;
+  const latest = reports
+    .map((r) => new Date(r.reportDate))
+    .sort((a, b) => b - a)[0];
+  return latest ? latest.toISOString().split("T")[0] : null;
+};
+
+const getActivityCount = (reports) => (reports ? reports.length : 0);
+
+const normalizePins = (pinList) => {
+  return pinList.map((pin) => ({
+    ...pin,
+    latestActivityDate: getLatestDateFromReports(pin.reports),
+    activityCount: getActivityCount(pin.reports),
+  }));
+};
+
+/* ============================================================
+   필터 적용 로직
+============================================================ */
+
+function applyFiltersToPins(pins, filters) {
+  return pins.filter((pin) => {
+    const reports = pin.reports || [];
+
+    /* ---- 날짜 필터 ---- */
+    let passDate = true;
+    if (filters.startDate || filters.endDate) {
+      const start = filters.startDate ? new Date(filters.startDate) : null;
+      const end = filters.endDate ? new Date(filters.endDate) : null;
+
+      passDate = reports.some((r) => {
+        const d = new Date(r.reportDate);
+        if (start && d < start) return false;
+        if (end && d > end) return false;
+        return true;
+      });
+    }
+    if (!passDate) return false;
+
+    /* ---- 단체명 필터 ---- */
+    const selectedOrgs = Object.keys(filters.orgs).filter(
+      (k) => filters.orgs[k]
+    );
+    if (selectedOrgs.length > 0) {
+      const passOrg = reports.some((r) =>
+        selectedOrgs.includes(makeSlug(r.reportName))
+      );
+      if (!passOrg) return false;
+    }
+
+    /* ---- 수거량 필터 ---- */
+    const selectedQ = Object.keys(filters.quantity).filter(
+      (k) => filters.quantity[k]
+    );
+    if (selectedQ.length > 0) {
+      const kg = pin.totalTrashKg || 0;
+      const passQuantity = selectedQ.some((range) => {
+        if (range === "low") return kg >= 0 && kg <= 10;
+        if (range === "mid") return kg > 10 && kg <= 50;
+        if (range === "high") return kg > 50 && kg <= 100;
+        if (range === "vhigh") return kg > 100;
+      });
+
+      if (!passQuantity) return false;
+    }
+
+    return true;
+  });
+}
+
+/* ============================================================
+   useMapLogic 훅
+============================================================ */
 
 export function useMapLogic() {
+  /* ---- 상태 ---- */
   const map = ref(null);
-  const pins = ref([]); // 핀 데이터 상태
-  const markers = ref([]); // 지도 마커 상태
-  const selectedPin = ref(null); // 선택된 핀 정보
-  const selectedMarker = ref(null); // 선택된 마커 참조
+  const pins = ref([]);
+  const markers = ref([]);
+  const selectedPin = ref(null);
+  const selectedMarker = ref(null);
+  const rawPins = ref([]);
 
-  // 필터 상태
   const filters = reactive({
-    startDate: "2025-10-09",
-    endDate: "2025-10-09",
-    orgs: {
-      dft: false,
-      ocean: false,
-      busan: false,
-      covo: false,
-      ssdamsokcho: false,
-      jigu: false,
-      sseom: false,
-      cleanup: false,
-      ecoteam: false,
-      ocean_protect: false,
-      project: false,
-      environment: false,
-      plog: false,
-      leader: false,
-      plogkorea: false,
-      bakaji: false,
-      team: false,
-      jeju: false,
-      honey: false,
-      sea: false,
-      other: false,
-    },
-    regions: {
-      west: false,
-      east: false,
-      south: false,
-      jeju: false,
-      inland: false,
-    },
+    startDate: "",
+    endDate: "",
+    orgs: Object.fromEntries(corpList.map((c) => [makeSlug(c.name), false])),
     quantity: {
       low: false,
       mid: false,
@@ -55,180 +112,114 @@ export function useMapLogic() {
     },
   });
 
-  // 네이버 지도 API 키
+  /* ---- 네이버 지도 API 로딩 ---- */
   const clientId = process.env.VUE_APP_NAVER_MAP_CLIENT_ID;
-
-  // 네이버 지도 API 로드
   const loadNaverMapAPI = () => {
     return new Promise((resolve, reject) => {
-      if (window.naver && window.naver.maps) {
-        resolve();
-        return;
-      }
+      if (window.naver && window.naver.maps) return resolve();
 
       const script = document.createElement("script");
       script.src = `https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=${clientId}`;
-
       script.onload = resolve;
       script.onerror = reject;
       document.head.appendChild(script);
     });
   };
 
+  /* ---- 마커 크기 조정 ---- */
   const resizeMarker = (marker, isSelected) => {
     const icon = marker.getIcon();
-    if (icon) {
-      const size = isSelected ? 48 : 32; // 선택 시 더 크게
-      icon.size = new window.naver.maps.Size(size, size);
-      icon.scaledSize = new window.naver.maps.Size(size, size);
-      icon.anchor = new window.naver.maps.Point(size / 2, size);
-      marker.setIcon(icon);
-    }
+    if (!icon) return;
+
+    const size = isSelected ? 48 : 32;
+    icon.size = new window.naver.maps.Size(size, size);
+    icon.scaledSize = new window.naver.maps.Size(size, size);
+    icon.anchor = new window.naver.maps.Point(size / 2, size);
+    marker.setIcon(icon);
   };
 
+  /* ---- 마커 클릭 ---- */
   const onMarkerClick = (pin, marker) => {
-    if (selectedMarker.value) {
-      resizeMarker(selectedMarker.value, false);
-    }
-
+    if (selectedMarker.value) resizeMarker(selectedMarker.value, false);
     resizeMarker(marker, true);
-
     selectedPin.value = pin;
     selectedMarker.value = marker;
   };
 
+  /* ---- 모달 닫기 ---- */
   const closeModal = () => {
-    if (selectedMarker.value) {
-      resizeMarker(selectedMarker.value, false);
-    }
-
+    if (selectedMarker.value) resizeMarker(selectedMarker.value, false);
     selectedPin.value = null;
     selectedMarker.value = null;
   };
 
+  /* ---- 마커 렌더링 ---- */
   const renderMarkers = () => {
-    markers.value.forEach((marker) => marker.setMap(null));
+    markers.value.forEach((m) => m.setMap(null));
     markers.value = [];
     if (!map.value) return;
 
     pins.value.forEach((pin) => {
-      if (pin.pinY && pin.pinX) {
-        let icon = null;
-        if (pin.pinColor) {
-          const color = pin.pinColor.toLowerCase();
-          if (color === "red") {
-            icon = {
-              url: redPinImg,
-              size: new window.naver.maps.Size(32, 32),
-              scaledSize: new window.naver.maps.Size(32, 32),
-              origin: new window.naver.maps.Point(0, 0),
-              anchor: new window.naver.maps.Point(16, 32),
-            };
-          } else if (color === "blue") {
-            icon = {
-              url: bluePinImg,
-              size: new window.naver.maps.Size(32, 32),
-              scaledSize: new window.naver.maps.Size(32, 32),
-              origin: new window.naver.maps.Point(0, 0),
-              anchor: new window.naver.maps.Point(16, 32),
-            };
-          } else if (color === "green") {
-            icon = {
-              url: greenPinImg,
-              size: new window.naver.maps.Size(32, 32),
-              scaledSize: new window.naver.maps.Size(32, 32),
-              origin: new window.naver.maps.Point(0, 0),
-              anchor: new window.naver.maps.Point(16, 32),
-            };
-          }
-        }
+      if (!pin.pinX || !pin.pinY) return;
 
-        const marker = new window.naver.maps.Marker({
-          position: new window.naver.maps.LatLng(pin.pinY, pin.pinX),
-          map: map.value,
-          title: pin.title || pin.pinId?.toString() || "",
-          ...(icon ? { icon } : {}),
-        });
+      let icon = null;
+      const color = pin.pinColor?.toLowerCase();
+      if (color === "red") icon = { url: redPinImg };
+      else if (color === "blue") icon = { url: bluePinImg };
+      else if (color === "green") icon = { url: greenPinImg };
 
-        window.naver.maps.Event.addListener(marker, "click", () => {
-          onMarkerClick(pin, marker);
-        });
-
-        markers.value.push(marker);
+      if (icon) {
+        icon.size = icon.scaledSize = new window.naver.maps.Size(32, 32);
+        icon.origin = new window.naver.maps.Point(0, 0);
+        icon.anchor = new window.naver.maps.Point(16, 32);
       }
+
+      const marker = new window.naver.maps.Marker({
+        position: new window.naver.maps.LatLng(pin.pinY, pin.pinX),
+        map: map.value,
+        title: pin.title || pin.pinId?.toString(),
+        ...(icon ? { icon } : {}),
+      });
+
+      window.naver.maps.Event.addListener(marker, "click", () =>
+        onMarkerClick(pin, marker)
+      );
+
+      markers.value.push(marker);
     });
   };
 
-  const buildFilterParams = (filters) => {
-    const params = {};
-
-    if (filters.startDate) params.startDate = filters.startDate;
-    if (filters.endDate) params.endDate = filters.endDate;
-
-    const selectedOrgs = Object.keys(filters.orgs).filter(
-      (key) => filters.orgs[key]
-    );
-    if (selectedOrgs.length > 0) params.organizations = selectedOrgs;
-
-    const regionMapping = {
-      west: "WEST_SEA",
-      east: "EAST_SEA",
-      south: "SOUTH_SEA",
-      jeju: "JEJU",
-      inland: "ULLEUNG",
-    };
-    const selectedRegions = Object.keys(filters.regions)
-      .filter((key) => filters.regions[key])
-      .map((key) => regionMapping[key] || key);
-    if (selectedRegions.length > 0) params.regions = selectedRegions;
-
-    // 수거량 (체크된 항목들을 배열로)
-    const selectedQuantities = Object.keys(filters.quantity).filter(
-      (key) => filters.quantity[key]
-    );
-    if (selectedQuantities.length > 0) params.quantities = selectedQuantities;
-
-    console.log("Filter params:", params); // 디버깅용 로그
-    return params;
-  };
-
+  /* ---- 핀 로딩 ---- */
   const loadPins = async () => {
     try {
-      const filterParams = buildFilterParams(filters);
-      console.log("Requesting pins with filters:", filterParams); // 디버깅용 로그
-      // pins.value = normalizePins(await fetchPinsWithFilters(filterParams));
-      pins.value = normalizePins([
+      rawPins.value = normalizePins([
         {
           pinId: 1,
           pinX: 126.9784,
           pinY: 37.5665,
           pinColor: "BLUE",
-
           totalTrashKg: 19.5,
           totalTrashL: 11.5,
-
           reports: [
             {
               reportId: 1,
               reportTitle: "서해 정화 활동",
-              reportName: "OrgA",
+              reportName: "디프다제주",
               reportDate: "2025-10-27",
               trashKg: 12.5,
               trashL: 8.0,
-              reportContent:
-                "즐거운 시간이었습니다.즐거운 시간이었습니다.즐거운 시간이었습니다.즐거운 시간이었습니다.",
-              photoPaths: [reviewImageEx],
+              reportContent: "즐거운 시간이었습니다.",
+              photoPaths: [],
             },
             {
               reportId: 2,
               reportTitle: "서해 해변 클린업",
-              reportName: "OrgB",
-              reportDate: "2025-10-29",
+              reportName: "쓰담속초",
+              reportDate: "2025-10-10",
               trashKg: 7.0,
               trashL: 3.5,
-              reportContent:
-                "즐거운 시간이었습니다.즐거운 시간이었습니다.즐거운 시간이었습니다.즐거운 시간이었습니다.즐거운 시간이었습니다.즐거운 시간이었습니다.즐거운 시간이었습니다.",
-              photoPaths: [reviewImageEx],
+              reportContent: "즐거운 시간이었습니다.",
+              photoPaths: [],
             },
           ],
         },
@@ -237,10 +228,8 @@ export function useMapLogic() {
           pinX: 129.075,
           pinY: 35.1796,
           pinColor: "RED",
-
           totalTrashKg: 0,
           totalTrashL: 0,
-
           reports: [],
         },
         {
@@ -248,21 +237,18 @@ export function useMapLogic() {
           pinX: 126.52,
           pinY: 33.4996,
           pinColor: "GREEN",
-
           totalTrashKg: 5.0,
           totalTrashL: 2.0,
-
           reports: [
             {
               reportId: 1,
               reportTitle: "서해 정화 활동",
-              reportName: "OrgA",
-              reportDate: "2025-10-27",
+              reportName: "쓰줍인",
+              reportDate: "2025-10-01",
               trashKg: 12.5,
               trashL: 8.0,
-              reportContent:
-                "즐거운 시간이었습니다.즐거운 시간이었습니다.즐거운 시간이었습니다.즐거운 시간이었습니다.즐거운 시간이었습니다.즐거운 시간이었습니다.즐거운 시간이었습니다.",
-              photoPaths: [reviewImageEx],
+              reportContent: "즐거운 시간이었습니다.",
+              photoPaths: [],
             },
             {
               reportId: 2,
@@ -272,62 +258,54 @@ export function useMapLogic() {
               trashKg: 7.0,
               trashL: 3.5,
               reportContent: null,
-              photoPaths: [reviewImageEx],
+              photoPaths: [],
             },
           ],
         },
       ]);
-      // console.log("Received pins:", pins.value); // 디버깅용 로그
-      renderMarkers();
+      // rawPins.value = normalizePins(await fetchPins());
+      applyFilters();
     } catch (e) {
       console.error("핀 데이터 불러오기 실패:", e);
     }
   };
 
-  // 지도 초기화
+  /* ---- 필터 적용 ---- */
+  const applyFilters = () => {
+    pins.value = applyFiltersToPins(rawPins.value, filters);
+    renderMarkers();
+  };
+
+  /* ---- 지도 초기화 ---- */
   const initializeMap = () => {
     if (!window.naver || !window.naver.maps) {
-      console.error("네이버 지도 API가 로드되지 않았습니다.");
+      console.error("네이버 지도 API가 로드되지 않음");
       return;
     }
-    const mapOptions = {
+
+    map.value = new window.naver.maps.Map("naverMap", {
       center: new window.naver.maps.LatLng(36.5, 127.5),
       zoom: 7,
       mapTypeControl: false,
-      scaleControl: true,
-      logoControl: true,
-      mapDataControl: true,
-    };
-    map.value = new window.naver.maps.Map("naverMap", mapOptions);
+    });
+
     loadPins();
   };
 
-  // 필터 초기화 함수
+  /* ---- 필터 초기화 ---- */
   const resetFilters = () => {
-    filters.startDate = "2025-10-09";
-    filters.endDate = "2025-10-09";
+    filters.startDate = "";
+    filters.endDate = "";
 
-    // 모든 단체 체크 해제
-    Object.keys(filters.orgs).forEach((key) => {
-      filters.orgs[key] = false;
-    });
+    Object.keys(filters.orgs).forEach((k) => (filters.orgs[k] = false));
+    Object.keys(filters.quantity).forEach((k) => (filters.quantity[k] = false));
 
-    // 모든 권역 체크 해제
-    Object.keys(filters.regions).forEach((key) => {
-      filters.regions[key] = false;
-    });
-
-    // 모든 수거량 체크 해제
-    Object.keys(filters.quantity).forEach((key) => {
-      filters.quantity[key] = false;
-    });
-
-    // 필터 초기화 후 핀 새로고침
-    loadPins();
+    pins.value = [...rawPins.value];
+    renderMarkers();
   };
 
-  // filters가 변경될 때마다 핀 새로 불러오기
-  watch(filters, loadPins, { deep: true });
+  /* ---- 필터 변경 감지 ---- */
+  watch(filters, applyFilters, { deep: true });
 
   return {
     map,
@@ -339,35 +317,7 @@ export function useMapLogic() {
     loadNaverMapAPI,
     initializeMap,
     resetFilters,
-    renderMarkers,
     loadPins,
     closeModal,
   };
 }
-
-const getLatestDateFromReports = (reports) => {
-  if (!reports || reports.length === 0) return null;
-
-  const latest = reports
-    .map((r) => new Date(r.reportDate))
-    .sort((a, b) => b - a)[0];
-
-  return latest ? latest.toISOString().split("T")[0] : null;
-};
-
-const getActivityCount = (reports) => {
-  return reports ? reports.length : 0;
-};
-
-const normalizePins = (pinList) => {
-  return pinList.map((pin) => {
-    const latestDate = getLatestDateFromReports(pin.reports);
-    const count = getActivityCount(pin.reports);
-
-    return {
-      ...pin,
-      latestActivityDate: latestDate || pin.latestActivityDate || null,
-      activityCount: count, // ⭐ 자동 계산!
-    };
-  });
-};
