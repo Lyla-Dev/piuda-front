@@ -2,22 +2,22 @@
 <template>
   <div class="gallery-card">
     <div class="header">
-      <h2>활동 후기 보기</h2>
+      <h2>활동 갤러리</h2>
       <button class="more-btn">후기 펼쳐보기</button>
     </div>
 
     <div class="gallery-container">
-      <button class="big-image-wrapper" v-if="mainImage">
-        <img :src="mainImage" alt="main" class="big-image" />
+      <button class="big-image-wrapper" v-if="mainReport">
+        <img :src="mainReport.photoUrl" :alt="`report-${mainReport.reportId}`" class="big-image" />
       </button>
 
       <div class="small-grid">
         <button
-          v-for="(img, index) in subImages"
-          :key="index"
+          v-for="report in subReports"
+          :key="report.reportId"
           class="small-image-wrapper"
         >
-          <img :src="img" class="small-image" />
+          <img :src="report.photoUrl" :alt="`report-${report.reportId}`" class="small-image" />
         </button>
       </div>
     </div>
@@ -27,24 +27,27 @@
 <script setup>
 import { computed } from "vue";
 
-const images = [
-  new URL("@/assets/reviewImageEx.png", import.meta.url).href,
-  new URL("@/assets/reviewImageEx.png", import.meta.url).href,
-  new URL("@/assets/reviewImageEx.png", import.meta.url).href,
-  new URL("@/assets/reviewImageEx.png", import.meta.url).href,
-  new URL("@/assets/reviewImageEx.png", import.meta.url).href,
-];
+const props = defineProps({
+  reports: {
+    type: Array,
+    default: () => []
+  }
+});
 
-const mainImage = computed(() => images.at(-1)); // 최신 1장
-const subImages = computed(() => images.slice(-5, -1).reverse());
+// 최신 5개의 리포트 (reportId, photoUrl)
+const recentReports = computed(() => {
+  return props.reports.slice(-5).reverse(); // 최신순으로 최대 5개
+});
+
+const mainReport = computed(() => recentReports.value[0]); // 가장 최신 1개
+const subReports = computed(() => recentReports.value.slice(1, 5)); // 나머지 4개
 </script>
 
 <style scoped>
 .gallery-card {
   background: #fff;
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 25px;
+  width: 100%;
+  padding: 24px;
   border-radius: 30px;
 }
 
@@ -52,7 +55,14 @@ const subImages = computed(() => images.slice(-5, -1).reverse());
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 25px;
+  margin-bottom: 20px;
+}
+
+.header h2 {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0;
+  color: #1f2937;
 }
 
 .more-btn {
@@ -65,15 +75,16 @@ const subImages = computed(() => images.slice(-5, -1).reverse());
 
 .gallery-container {
   display: grid;
-  grid-template-columns: 260px 1fr;
-  gap: 2px;
+  grid-template-columns: 240px 1fr;
+  gap: 8px;
 }
 
 .big-image-wrapper {
-  width: 260px;
-  height: 260px;
+  width: 240px;
+  height: 240px;
   overflow: hidden;
   flex-shrink: 0;
+  border-radius: 8px;
 }
 
 .big-image {
@@ -84,15 +95,17 @@ const subImages = computed(() => images.slice(-5, -1).reverse());
 
 .small-grid {
   display: grid;
-  grid-template-columns: repeat(2, 125px);
-  grid-template-rows: repeat(2, 125x);
-  gap: 2px;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 8px;
+  max-width: 100%;
 }
 
 .small-image-wrapper {
-  width: 125px;
-  height: 128px;
+  width: 100%;
+  height: 116px;
   overflow: hidden;
+  border-radius: 8px;
 }
 
 .big-image-wrapper,

@@ -18,15 +18,25 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import ProfileImage from "@/components/DashBoardView/Components/CropImage.vue";
 
-// 실제 데이터가 API라면 props로 받을 수도 있음
+const props = defineProps({
+  userName: {
+    type: String,
+    default: '사용자'
+  },
+  startDate: {
+    type: String,
+    default: ''
+  }
+});
+
 const profileImage = ref(
   new URL("@/assets/profile.jpeg", import.meta.url).href
 );
-const name = ref("이민형");
-const startDate = ref("2025.11.09");
+const name = computed(() => props.userName || '사용자');
+const startDate = computed(() => props.startDate || '');
 </script>
 
 <style scoped>
@@ -35,7 +45,14 @@ const startDate = ref("2025.11.09");
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
+}
+
+.header h2 {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0;
+  color: #1f2937;
 }
 
 .profile-card {

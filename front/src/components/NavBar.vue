@@ -45,7 +45,8 @@
       </div>
       
       <div v-else class="user-info">
-        <span class="username">{{ currentUser?.email?.split('@')[0] }}님</span>
+        <span class="username">{{ userName }}님</span>
+        <button @click="goToDashboard" class="dashboard-btn">대시보드</button>
         <button @click="logout" class="logout-btn">로그아웃</button>
       </div>
     </div>
@@ -64,11 +65,33 @@ const router = useRouter()
 const isHome = ref(true) // ✅ 반응형으로 관리
 const isLoggedIn = ref(false)
 const currentUser = ref(null)
+const userName = ref('')
 
 // 로그인 상태 확인
 const checkAuthStatus = () => {
   isLoggedIn.value = authAPI.isLoggedIn()
   currentUser.value = authAPI.getCurrentUser()
+  
+  // 사용자 이름 설정 (userName 또는 email에서 추출)
+  if (currentUser.value) {
+    userName.value = currentUser.value.userName || currentUser.value.email?.split('@')[0] || '사용자'
+  }
+}
+
+// 대시보드로 이동 (role에 따라 분기)
+const goToDashboard = () => {
+  const role = currentUser.value?.role
+  
+  if (role === 'ADMIN') {
+    router.push('/manager-dashboard')
+  } else if (role === 'GROUP') {
+    router.push('/corps-dashboard')
+  } else if (role === 'PRIVATE') {
+    router.push('/my-dashboard')
+  } else {
+    // 기본값: 개인 대시보드
+    router.push('/my-dashboard')
+  }
 }
 
 // 로그아웃 처리
@@ -79,6 +102,7 @@ const logout = () => {
   // 상태 업데이트
   isLoggedIn.value = false
   currentUser.value = null
+  userName.value = ''
   
   // 홈으로 이동
   router.push('/')
@@ -237,6 +261,7 @@ onMounted(() => {
   font-size: 0.9rem;
 }
 
+.dashboard-btn,
 .logout-btn {
   background: transparent;
   border: 1px solid rgba(255, 255, 255, 0.3);
@@ -248,6 +273,7 @@ onMounted(() => {
   transition: all 0.2s ease;
 }
 
+.dashboard-btn:hover,
 .logout-btn:hover {
   background: rgba(255, 255, 255, 0.1);
   border-color: rgba(255, 255, 255, 0.5);
@@ -258,11 +284,13 @@ onMounted(() => {
   color: #1a2b6d !important;
 }
 
+.navbar--solid .dashboard-btn,
 .navbar--solid .logout-btn {
   border-color: rgba(26, 43, 109, 0.3);
   color: #1a2b6d !important;
 }
 
+.navbar--solid .dashboard-btn:hover,
 .navbar--solid .logout-btn:hover {
   background: rgba(26, 43, 109, 0.1);
   border-color: rgba(26, 43, 109, 0.5);
