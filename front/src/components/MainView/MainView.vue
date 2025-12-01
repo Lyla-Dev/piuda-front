@@ -43,15 +43,6 @@
           작은 행동이 일으키는 변화의 물결에<br />
           함께 해보아요
         </p>
-        <button @click="$router.push('/my-dashboard')">
-          <span class="button-text">개인대시보드(테스트용 버튼)</span>
-        </button>
-        <button @click="$router.push('/corps-dashboard')">
-          <span class="button-text">단체대시보드(테스트용 버튼)</span>
-        </button>
-        <button @click="$router.push('/manager-dashboard')">
-          <span class="button-text">관리자대시보드(테스트용 버튼)</span>
-        </button>
       </div>
 
       <!-- 오른쪽 버튼 2x2 -->
