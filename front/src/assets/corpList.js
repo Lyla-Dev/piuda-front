@@ -36,7 +36,7 @@ export const corpList = [
     region: "제주",
   },
   {
-    name: "유명인해양청소봉사단 COVO",
+    name: "유명인해양청소봉사단",
     ceo: "김재열",
     email: "founder@covo.kr",
     region: "동해",
@@ -48,7 +48,7 @@ export const corpList = [
     region: "제주",
   },
   {
-    name: "클린낚시캠페인운동본부",
+    name: "클린낚시운동본부",
     ceo: "권은정",
     email: "give@bf.or.kr",
     region: "동해",
