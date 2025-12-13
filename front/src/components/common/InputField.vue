@@ -50,6 +50,7 @@ defineEmits(['update:modelValue']);
 .label { 
   font-weight:600; 
   font-size:14px;
+  margin-bottom: 5px;
 }
 
 .req { 
@@ -58,7 +59,7 @@ defineEmits(['update:modelValue']);
 }
 
 .control { 
-  padding:8px 12px;
+  padding:12px 12px;
   border:1px solid #8C8C8C; 
   border-radius:9999px;
   font-size:14px;
