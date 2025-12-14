@@ -1,20 +1,20 @@
 <template>
   <nav :class="['navbar', { 'navbar--solid': !isHome }]">
-    <!-- 로고 -->
     <div class="logo">
       <router-link to="/" class="logo-link">
         <img
-          :src="isHome ? require('@/assets/logo.png') : require('@/assets/logo_navy.png')"
+          :src="
+            isHome
+              ? require('@/assets/logo.png')
+              : require('@/assets/logo_navy.png')
+          "
           alt="로고"
         />
       </router-link>
     </div>
 
-    <!-- 메뉴 -->
     <ul class="menu">
       <li><router-link to="/intro">소개</router-link></li>
-
-      <!-- 활동 (드롭다운) -->
       <li
         class="dropdown"
         @mouseenter="showDropdown = true"
@@ -38,12 +38,11 @@
       <li><router-link to="/info">공지</router-link></li>
     </ul>
 
-    <!-- 로그인/사용자 정보 -->
     <div class="auth-section">
       <div v-if="!isLoggedIn" class="login">
         <router-link to="/login">Login</router-link>
       </div>
-      
+
       <div v-else class="user-info">
         <span class="username">{{ userName }}님</span>
         <button @click="goToDashboard" class="dashboard-btn">대시보드</button>
@@ -54,77 +53,72 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted } from "vue"
-import { useRoute, useRouter } from "vue-router"
-import { authAPI } from '@/api/auth'
+import { ref, watch, onMounted } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { authAPI } from "@/api/auth";
 
-const showDropdown = ref(false)
-const route = useRoute()
-const router = useRouter()
+const showDropdown = ref(false);
+const route = useRoute();
+const router = useRouter();
 
-const isHome = ref(true) // ✅ 반응형으로 관리
-const isLoggedIn = ref(false)
-const currentUser = ref(null)
-const userName = ref('')
+const isHome = ref(true);
+const isLoggedIn = ref(false);
+const currentUser = ref(null);
+const userName = ref("");
 
-// 로그인 상태 확인
 const checkAuthStatus = () => {
-  isLoggedIn.value = authAPI.isLoggedIn()
-  currentUser.value = authAPI.getCurrentUser()
-  
-  // 사용자 이름 설정 (userName 또는 email에서 추출)
-  if (currentUser.value) {
-    userName.value = currentUser.value.userName || currentUser.value.email?.split('@')[0] || '사용자'
-  }
-}
+  isLoggedIn.value = authAPI.isLoggedIn();
+  currentUser.value = authAPI.getCurrentUser();
 
-// 대시보드로 이동 (role에 따라 분기)
+  if (currentUser.value) {
+    userName.value =
+      currentUser.value.userName ||
+      currentUser.value.email?.split("@")[0] ||
+      "사용자";
+  }
+};
+
 const goToDashboard = () => {
-  const role = currentUser.value?.role
-  
-  if (role === 'ADMIN') {
-    router.push('/manager-dashboard')
-  } else if (role === 'GROUP') {
-    router.push('/corps-dashboard')
-  } else if (role === 'PRIVATE') {
-    router.push('/my-dashboard')
+  const role = currentUser.value?.role;
+
+  if (role === "ADMIN") {
+    router.push("/manager-dashboard");
+  } else if (role === "GROUP") {
+    router.push("/corps-dashboard");
+  } else if (role === "PRIVATE") {
+    router.push("/my-dashboard");
   } else {
     // 기본값: 개인 대시보드
-    router.push('/my-dashboard')
+    router.push("/my-dashboard");
   }
-}
+};
 
-// 로그아웃 처리
 const logout = () => {
-  const result = authAPI.logout()
-  alert(result.message)
-  
-  // 상태 업데이트
-  isLoggedIn.value = false
-  currentUser.value = null
-  userName.value = ''
-  
-  // 홈으로 이동
-  router.push('/')
-}
+  const result = authAPI.logout();
+  alert(result.message);
+
+  isLoggedIn.value = false;
+  currentUser.value = null;
+  userName.value = "";
+
+  router.push("/");
+};
 
 watch(
   () => route.path,
   (newPath) => {
-    isHome.value = newPath === "/"
-    // 경로 변경시마다 로그인 상태 확인
-    checkAuthStatus()
+    isHome.value = newPath === "/";
+    checkAuthStatus();
   },
-  { immediate: true } // 첫 렌더링 시 즉시 적용
-)
+  { immediate: true }
+);
 
 onMounted(() => {
-  checkAuthStatus()
-})
+  checkAuthStatus();
+});
 </script>
 
 <style scoped>
-/* ===== 기본 네비게이션 구조 ===== */
 .navbar {
   position: absolute;
   top: 0;
@@ -138,7 +132,6 @@ onMounted(() => {
   z-index: 10;
 }
 
-/* ====== 흰 배경 + 남색 텍스트 ====== */
 .navbar--solid {
   background: white;
   color: #1a2b6d;
@@ -148,7 +141,7 @@ onMounted(() => {
 .navbar--solid .menu a,
 .navbar--solid .menu span,
 .navbar--solid .login a {
-  color: #1a2b6d !important; /* ✅ 덮어쓰기 */
+  color: #1a2b6d !important;
 }
 
 .navbar--solid .menu a:hover,
@@ -157,7 +150,6 @@ onMounted(() => {
   color: #5060b5 !important;
 }
 
-/* 로고 */
 .logo {
   display: flex;
   align-items: center;
@@ -171,13 +163,13 @@ onMounted(() => {
   font-size: 1rem;
 }
 
-/* 메뉴 */
 .menu {
   list-style: none;
   display: flex;
-  gap: 2rem;
+  gap: 5rem;
   align-items: center;
-  margin: 0;
+  /* margin: 0; */
+  margin-right: 40px;
   padding: 0;
 }
 .menu li {
@@ -196,7 +188,6 @@ onMounted(() => {
   color: #cfd8ff;
 }
 
-/* ===== 드롭다운 메뉴 ===== */
 .dropdown-menu {
   position: absolute;
   top: 2.2rem;
@@ -223,7 +214,6 @@ onMounted(() => {
   font-weight: 600;
 }
 
-/* ===== 페이드 전환 ===== */
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.2s ease;
@@ -233,12 +223,10 @@ onMounted(() => {
   opacity: 0;
 }
 
-/* ===== 인증 섹션 ===== */
 .auth-section {
   margin-right: 4rem;
 }
 
-/* 로그인 버튼 */
 .login a {
   color: white;
   text-decoration: none;
@@ -248,7 +236,6 @@ onMounted(() => {
   color: #cfd8ff;
 }
 
-/* 사용자 정보 */  
 .user-info {
   display: flex;
   align-items: center;
@@ -279,7 +266,6 @@ onMounted(() => {
   border-color: rgba(255, 255, 255, 0.5);
 }
 
-/* 고체 배경에서 사용자 정보 스타일 */
 .navbar--solid .username {
   color: #1a2b6d !important;
 }
