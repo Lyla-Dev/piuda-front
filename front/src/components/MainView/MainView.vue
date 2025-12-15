@@ -229,7 +229,7 @@ let autoSlideInterval;
 let heroAutoSlideInterval;
 
 // SHOULD BE DELETED
-const USE_MOCK_API = true;
+const USE_MOCK_API = false;
 const MOCK_MAINPAGE_REVIEWS = [
   {
     orgName: "쓰담 속초",

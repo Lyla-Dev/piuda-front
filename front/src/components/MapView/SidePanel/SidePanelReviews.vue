@@ -43,7 +43,7 @@ const props = defineProps({
 
 const router = useRouter();
 const goToReview = (reportId) => {
-  router.push(`api/report/${reportId}`);
+  router.push(`/report/${reportId}`);
 };
 
 const sortedLogs = computed(() => {
