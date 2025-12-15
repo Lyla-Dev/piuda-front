@@ -128,7 +128,7 @@
 </template>
 
 <script>
-
+import http from '@/api/http';
 
 const clientId = process.env.VUE_APP_NAVER_MAP_CLIENT_ID; // 신고서에서 쓰던 키 그대로
 
@@ -252,12 +252,8 @@ export default {
     try {
       this.loading = true;
 
-      const res = await fetch(`/api/report/${this.id}`);
-      if (!res.ok){
-        this.review = null;
-        return;
-      }
-      const data = await res.json();
+      const res = await http.get(`/report/${this.id}`);
+      const data = res.data;
 
       const trashTypesMap = {
             '페트병': data.trashPet,

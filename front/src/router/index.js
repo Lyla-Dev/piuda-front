@@ -29,6 +29,7 @@ const routes = [
   { path: "/review-list", name: "ReviewList", component: ReviewList },
   { path: "/my-dashboard", name: "MyDashboard", component: MyDashboard },
   { path: "/review/:id", name: "ReviewDetail", component: ReviewDetail, props: true },
+  { path: "/report/:id", name: "ReportDetail", component: ReviewDetail, props: true },
   { path: "/award", name: "Award", component: AwardView },
 
 
