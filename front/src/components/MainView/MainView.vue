@@ -1,4 +1,5 @@
 <template>
+  <div>
   <section class="hero">
     <div class="hero-slider">
       <div
@@ -138,11 +139,17 @@
       Copyright ⓒ 2025 바다살리기네트워크 All rights reserved.
     </p>
   </footer>
+  <!-- 화면 위에 떠있는 수달 -->
+    <OtterWidget />
+  </div>
+
 </template>
+
 
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from "vue";
 import { useRouter } from "vue-router";
+import OtterWidget from "@/components/common/OtterWidget.vue";
 
 const router = useRouter();
 const reviews = ref([]);
@@ -776,4 +783,6 @@ footer .copyright {
   font-size: 0.8rem;
   opacity: 0.8;
 }
+
+
 </style>
