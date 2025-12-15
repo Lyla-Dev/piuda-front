@@ -1,7 +1,7 @@
 import { ref, reactive, watch } from "vue";
 import redPinImg from "@/assets/redpin.png";
 import bluePinImg from "@/assets/bluepin.png";
-import greenPinImg from "@/assets/greenpin.png";
+import whitePinImg from "@/assets/whitepin.png";
 import { corpList } from "@/assets/corpList";
 import { fetchPins } from "./MapApi";
 
@@ -166,7 +166,7 @@ export function useMapLogic() {
       const color = pin.pinColor?.toLowerCase();
       if (color === "red") icon = { url: redPinImg };
       else if (color === "blue") icon = { url: bluePinImg };
-      else if (color === "green") icon = { url: greenPinImg };
+      else if (color === "white") icon = { url: whitePinImg };
 
       if (icon) {
         icon.size = icon.scaledSize = new window.naver.maps.Size(32, 32);
