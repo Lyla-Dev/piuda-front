@@ -17,7 +17,13 @@
           <p class="review-desc">{{ log.description }}</p>
         </div>
         <div v-if="log.thumbnailUrl" class="review-thumb-wrap">
-          <img class="review-thumb" :src="log.thumbnailUrl" :alt="log.title" />
+          <img 
+            class="review-thumb" 
+            :src="log.thumbnailUrl" 
+            :alt="log.title" 
+            @load="handleImageLoad(log)"
+            @error="handleImageError(log)"
+          />
         </div>
       </li>
     </ul>
@@ -45,6 +51,21 @@ const sortedLogs = computed(() => {
     return new Date(b.date) - new Date(a.date);
   });
 });
+
+const handleImageLoad = (log) => {
+  console.log('✅ 후기 이미지 로드 성공:', {
+    title: log.title,
+    url: log.thumbnailUrl
+  });
+};
+
+const handleImageError = (log) => {
+  console.error('❌ 후기 이미지 로드 실패:', {
+    title: log.title,
+    url: log.thumbnailUrl,
+    message: 'presigned URL 만료 또는 잘못된 URL'
+  });
+};
 </script>
 
 <style scoped>
