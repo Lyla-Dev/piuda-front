@@ -72,11 +72,10 @@
       <ListCard
         title="시민 제보 현황"
         :columns="[
-          { label: '제보 ID', key: 'reportId', width: '10%' },
-          { label: '제보일', key: 'reportDate', width: '15%' },
-          { label: '제보 내용', key: 'content', width: '20%' },
-          { label: '제보 사진', key: 'photo', width: '12%' },
-          { label: '처리', key: 'action', width: '25%' },
+          { label: '제보 ID', key: 'reportId', width: '15%' },
+          { label: '제보일', key: 'reportDate', width: '25%' },
+          { label: '제보 사진', key: 'photo', width: '15%' },
+          { label: '처리', key: 'action', width: '35%' },
         ]"
         :contents="formattedNotifies"
         :actions="[
@@ -138,9 +137,9 @@ const formattedNotifies = computed(() => {
   
   // WAIT 상태인 제보만 필터링
   return notifies
-    .filter(notify => (notify.notifyStatus || notify.status) === 'WAIT')
+    .filter(notify => notify.notifyStatus === 'WAIT')
     .map(notify => {
-      const dateStr = notify.notifyCreatedAt || notify.createdAt;
+      const dateStr = notify.notifyCreatedAt;
       let formattedDate = new Date().toISOString().split('T')[0];
       
       if (dateStr) {
@@ -154,12 +153,11 @@ const formattedNotifies = computed(() => {
       }
       
       return {
-        reportId: notify.notifyId || notify.id,
+        reportId: notify.notifyId,
         reportDate: formattedDate,
-        content: notify.notifyContent || notify.content || ' - ',
         photoUrl: (notify.photoUrls && notify.photoUrls.length > 0) ? notify.photoUrls[0] : null,
         photoUrls: notify.photoUrls || [],
-        status: notify.notifyStatus || notify.status
+        status: notify.notifyStatus
       };
     });
 });
