@@ -10,7 +10,7 @@ import { useRouter } from "vue-router";
 import otterImg from "@/assets/otter.png";
 
 const router = useRouter();
-const go = () => router.push("/otter");
+const go = () => router.push("/award");
 </script>
 
 <style scoped>
