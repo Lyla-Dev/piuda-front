@@ -57,77 +57,67 @@
 
       <!-- 상세 정보 카드 -->
       <section class="detail-card">
-        <!-- 섹션 1: 활동 위치 및 시간 -->
-        <p class="section-caption">활동 위치 및 시간</p>
+  <!-- ✅ 1) 활동 위치 및 시간 블럭 -->
+  <div class="section-block">
+    <p class="section-caption">활동 위치 및 시간</p>
 
-        <div class="info-row">
-          <span class="info-label">활동 장소</span>
-          <span class="info-value">
-            {{ review.info.split('|')[0].trim() }}
-          </span>
-        </div>
+    <div class="info-row">
+      <span class="info-label">활동 장소</span>
+      <span class="info-value">{{ review.info.split('|')[0].trim() }}</span>
+    </div>
 
-        <!-- ⭐ 여기에서 지도 표시 -->
-        <div
-          v-if="review.lat && review.lng"
-          class="map-wrapper"
-        >
-          <div ref="detailMap" class="detail-map"></div>
-        </div>
+    <div v-if="review.lat && review.lng" class="map-wrapper">
+      <div ref="detailMap" class="detail-map"></div>
+    </div>
 
-        <div class="divider"></div>
+    <div class="divider"></div>
 
-        <div class="info-row">
-          <span class="info-label">활동 일시</span>
-          <span class="info-value">
-            {{ review.info.split('|')[1] && review.info.split('|')[1].trim() }}
-          </span>
-        </div>
+    <div class="info-row">
+      <span class="info-label">활동 일시</span>
+      <span class="info-value">
+        {{ review.info.split('|')[1] && review.info.split('|')[1].trim() }}
+      </span>
+    </div>
 
-        <div class="divider"></div>
+    <div class="divider"></div>
 
-        <div class="info-row">
-          <span class="info-label">상세 위치</span>
-          <span class="info-value">
-            {{ review.locationDetail || '-' }}
-          </span>
-        </div>
+    <div class="info-row">
+      <span class="info-label">상세 위치</span>
+      <span class="info-value">{{ review.locationDetail || '-' }}</span>
+    </div>
+  </div>
 
-        <div class="divider divider-section"></div>
+  <!-- ✅ 2) 쓰레기 정보 블럭 -->
+  <div class="section-block">
+    <p class="section-caption">쓰레기 정보</p>
 
-        <!-- 섹션 2: 쓰레기 정보 -->
-        <p class="section-caption">쓰레기 정보</p>
+    <div class="info-row">
+      <span class="info-label">무게 / 부피</span>
+      <span class="info-value">
+        <template v-if="review.amount || review.volume">
+          <span v-if="review.amount">{{ review.amount }}kg</span>
+          <span v-if="review.amount && review.volume"> / </span>
+          <span v-if="review.volume">{{ review.volume }}L</span>
+        </template>
+        <span v-else>-</span>
+      </span>
+    </div>
 
-        <div class="info-row">
-          <span class="info-label">무게 / 부피</span>
-          <span class="info-value">
-            <template v-if="review.amount || review.volume">
-              <span v-if="review.amount">{{ review.amount }}kg</span>
-              <span v-if="review.amount && review.volume"> / </span>
-              <span v-if="review.volume">{{ review.volume }}L</span>
-            </template>
-            <span v-else>-</span>
-          </span>
-        </div>
+    <div class="divider"></div>
 
-        <div class="divider"></div>
+    <div class="info-row">
+      <span class="info-label">쓰레기 종류</span>
+      <span class="info-value">{{ review.trashTypes || '-' }}</span>
+    </div>
 
-        <div class="info-row">
-          <span class="info-label">쓰레기 종류</span>
-          <span class="info-value">
-            {{ review.trashTypes || '-' }}
-          </span>
-        </div>
+    <div class="divider"></div>
 
-        <div class="divider divider-section"></div>
-
-        <div class="info-row">
-          <span class="info-label">상세 설명</span>
-          <span class="info-value info-description">
-            {{ review.content }}
-          </span>
-        </div>
-      </section>
+    <div class="info-row">
+      <span class="info-label">상세 설명</span>
+      <span class="info-value info-description">{{ review.content }}</span>
+    </div>
+  </div>
+</section>
 
     </main>
 
@@ -138,9 +128,7 @@
 </template>
 
 <script>
-import reviewImg1 from '@/assets/reviewdetail1.png';
-import reviewImg2 from '@/assets/reviewdetail2.png';
-import reviewImg3 from '@/assets/reviewdetail3.png';
+
 
 const clientId = process.env.VUE_APP_NAVER_MAP_CLIENT_ID; // 신고서에서 쓰던 키 그대로
 
@@ -149,76 +137,28 @@ export default {
   props: ['id'],
   data() {
     return {
-      isScrapped: false,
+      review:null,
+      loading: false,
+      error: null,
       currentImageIndex: 0,
+      isScrapped: false,
       map: null,
       marker: null,
-      // 🔻 지금은 예시로 하드코딩, 나중에는 백엔드 응답으로 교체하면 됨
-      reviews: [
-        {
-          id: 1,
-          team: "디프다제주",
-          activity: "해안 쓰레기 줍기 활동",
-          info: "인천 해안 | 2025.10",
-          content: "인천 해안을 함께 걸으며 플로깅을 진행했습니다. 생각보다 많은 쓰레기를 보며 충격을 받았지만, 팀원들과 함께 정화 활동을 하며 보람을 느꼈습니다.",
-          images: [reviewImg1, reviewImg2, reviewImg3],
-          lat: 37.458,      // ⭐ 예시 좌표 (백엔드에서 들어왔다고 가정)
-          lng: 126.705,
-          locationDetail: "인천 ○○해변 산책로 구간",
-          amount: "18",
-          volume: "40",
-          trashTypes: "플라스틱, 페트병, 스티로폼, 어구"
-        },
-        {
-          id: 2,
-          team: "봉그젠",
-          activity: "신진 활동가 양성 프로젝트",
-          info: "제주 해안 | 2025.09",
-          content: "해양 환경 교육과 함께 실제 정화 활동을 병행한 프로젝트였습니다.",
-          images: [reviewImg1, reviewImg2]
-          // lat/lng 없으니 지도 안 나옴
-        },
-        {
-          id: 3,
-          team: "쓰담속초",
-          activity: "심해 쓰레기 수거 활동",
-          info: "속초 해안 | 2025.08.21",
-          content: "심해 쓰레기 수거 과정을 직접 보고, 우리가 버린 쓰레기가 결국 다시 우리에게 돌아온다는 사실을 체감했습니다.",
-          amount: "24kg",
-          images: [
-            "https://images.pexels.com/photos/2774301/pexels-photo-2774301.jpeg",
-            "https://images.pexels.com/photos/4558800/pexels-photo-4558800.jpeg"
-          ]
-        },
-        {
-          id: 4,
-          team: "쓰줍인",
-          activity: "해안 쓰레기 줍기 활동",
-          info: "인천 해안 | 2025.10",
-          content: "가족 단위 참여자가 많아 아이들과 환경에 대해 이야기 나눌 수 있어 좋았습니다.",
-          images: []
-        }
-      ]
     };
   },
-  computed: {
-    review() {
-      const idNum = Number(this.id);
-      return this.reviews.find((r) => r.id === idNum) || null;
-    }
-  },
+    
   watch: {
     id() {
       this.currentImageIndex = 0;
-      this.$nextTick(() => this.setupMap());
+      this.fetchReviewDetail();
     },
     review() {
-      // review 데이터가 바뀌면 지도도 다시 그림
-      this.$nextTick(() => this.setupMap());
+      this.$nextTick(()=> this.setupMap())
     }
+
   },
   mounted() {
-    this.$nextTick(() => this.setupMap());
+    this.fetchReviewDetail();
   },
   methods: {
     toggleScrap() {
@@ -244,6 +184,9 @@ export default {
         this.currentImageIndex -= 1;
       }
     },
+    
+
+    
 
     async setupMap() {
       if (!this.review || !this.review.lat || !this.review.lng) return;
@@ -302,9 +245,73 @@ export default {
         position: center,
         map: this.map
       });
+      
+    },
+
+    async fetchReviewDetail() {
+    try {
+      this.loading = true;
+
+      const res = await fetch(`/api/report/${this.id}`);
+      if (!res.ok){
+        this.review = null;
+        return;
+      }
+      const data = await res.json();
+
+      const trashTypesMap = {
+            '페트병': data.trashPet,
+            '봉투': data.trashBag,
+            '그물': data.trashNet,
+            '유리': data.trashGlass,
+            '캔': data.trashCan,
+            '로프': data.trashRope,
+            '천조각': data.trashCloth,
+            '전자제품': data.trashElec,
+            '기타': data.trashEtc,
+        };
+
+        const trashTypesArray = Object.entries(trashTypesMap)
+            .filter(([, count]) => count > 0)
+            .map(([type, count]) => `${type}: ${count}개`);
+
+        const formattedTrashTypes = trashTypesArray.length 
+            ? trashTypesArray.join(', ') 
+            : '-';
+
+      this.review = {
+        activity: data.reportTitle,
+        team: data.reportName || data.writerName,
+        images: data.photoUrls || [],
+        info: `${data.reportName} | ${data.reportDate}`,
+        content: data.reportContent || '',
+        locationDetail: data.reportDetailLocation || '-',
+        amount: data.trashKg || null,
+        volume: data.trashL || null,
+        trashTypes: formattedTrashTypes, 
+        lat: data.pinY || null, 
+        lng: data.pinX || null,
+        
+      };
+        if (!this.review.activity) { 
+            this.review = null;
+        }
+      
+    } catch (e) {
+      this.error = '후기를 불러오지 못했습니다.';
+      console.error(e);
+      this.review = null;
+    } finally {
+      this.loading = false;
     }
-  }
+  },
+
+  },
+
+
 };
+
+
 </script>
 
 <style scoped>
@@ -459,26 +466,28 @@ export default {
   background-color: #e5e5e5;
 }
 .info-description {
-  margin-top: 12px;
+  margin-top: 20px;
   color: #333;
   line-height: 1.7;
   white-space: pre-line;
 }
 
 .section-caption {
-  margin-top: 12px;
-  font-size: 13px;
+  margin-top: 32px;
+  font-size: 18px;
   font-weight: 600;
   color: #555;
 }
 
 .detail-card .section-caption:first-of-type {
-  margin-top: 4px;
+  margin-top: 10px;
 }
 
 .map-wrapper {
-  margin-top: 8px;
-  margin-bottom: 12px;
+  margin: 12px 0 12px 145px;
+  width: 100%;
+  max-width: 600px;
+  
   border-radius: 18px;
   overflow: hidden;
   background: #f3f4f8;
@@ -492,4 +501,34 @@ export default {
 .divider-section {
   margin-top: 8px;
 }
+
+/* 바깥 컨테이너는 배경만 깔끔하게 */
+.detail-card{
+  background: transparent;
+  padding: 0;
+  box-shadow: none;
+}
+
+/* 섹션 박스 2개 */
+.section-block{
+  background: #fff;
+  border-radius: 16px;
+  padding: 28px 32px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+}
+
+/* 두 박스 사이 간격 */
+.section-block + .section-block{
+  margin-top: 18px;
+}
+
+/* 섹션 제목 */
+.section-caption{
+  margin: 0 0 18px;
+  font-size: 18px;      /* 원하면 더 키워도 됨 */
+  font-weight: 800;
+  color: #222;
+}
+
+
 </style>
