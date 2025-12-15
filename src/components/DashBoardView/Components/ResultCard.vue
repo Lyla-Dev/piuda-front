@@ -1,0 +1,61 @@
+<template>
+  <div class="result-card">
+    <div class="stat-header">
+      <span class="stat-title">{{ title }}</span>
+    </div>
+
+    <div class="stat-result">{{ result }}{{ unit }}</div>
+  </div>
+</template>
+
+<script>
+export default {
+  name: "StatCard",
+  props: {
+    title: {
+      type: String,
+      required: true,
+    },
+    delta: {
+      type: Number,
+      required: true,
+    },
+    result: {
+      type: Number,
+      required: true,
+    },
+    unit: {
+      type: String,
+      default: '개',
+    },
+  },
+};
+</script>
+
+<style scoped>
+.result-card {
+  width: 160px;
+  height: 70px;
+  padding: 20px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.stat-header {
+  display: flex;
+  align-items: center;
+}
+
+.stat-title {
+  font-size: 16px;
+  color: #444;
+}
+
+.stat-result {
+  font-size: 30px;
+  font-weight: 600;
+  margin-top: 15px;
+  color: #2d336b;
+}
+</style>

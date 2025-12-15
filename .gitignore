@@ -1,67 +1,23 @@
-# Dependencies
-node_modules/
+.DS_Store
+node_modules
+/dist
 
-# Production builds
-/dist/
-dist/
-build/
-.next/
-out/
 
-# Environment files
-.env
-.env.*
-!.env.example
+# local env files
+.env.local
+.env.*.local
 
-# Logs
-logs
-*.log
-*.log.*
+# Log files
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
-lerna-debug.log*
-report.*.json
-
-# Coverage and test outputs
-coverage/
-.happypack/
-
-# Caches and temp
-.cache/
-.tmp/
-.temp/
-.DS_Store
-Thumbs.db
 
 # Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea/
+.idea
+.vscode
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
-
-# Yarn (Berry) cache
-.yarn/*
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/sdks
-!.yarn/versions
-
-# Local tooling
-.eslintcache
-.stylelintcache
-
-# Vue / Vite specific
-node_modules/.vite
-vite.svg
-
-# Misc
-*.local
-
-node_modules
