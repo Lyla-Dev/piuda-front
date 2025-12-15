@@ -1,5 +1,6 @@
 <template>
   <div class="award-view">
+    <h1 class="award-top">25-4분기 베스트 어워드</h1>
     <div class="leaf-bg" :style="{ backgroundImage: `url(${leaf})` }" aria-hidden="true"></div>
     <div class="decor">
       <div class="title"> {{ titleText }} </div>
@@ -155,6 +156,7 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
+@import url('https://fonts.googleapis.com/css2?family=BBH+Bogle&display=swap');
 .award-view{
   width:100%;
   height:100vh;
@@ -205,7 +207,7 @@ onBeforeUnmount(() => {
   margin-bottom:6px;
 }
 
-.subtitle{ font-size:14px; color:rgba(255,230,180,0.95); margin-bottom:22px; letter-spacing:2px }
+.subtitle{ font-size:20px; color:rgba(255,230,180,0.95); margin-bottom:22px; letter-spacing:2px }
 .grouptitle{ font-size:25px; color:rgba(255,230,180,0.95); margin-bottom:22px; letter-spacing:2px }
 .center-image{ max-width:38%; height:auto; object-fit:contain; filter:drop-shadow(0 12px 36px rgba(0,0,0,0.6)); border-radius:8px; background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.06)); padding:8px }
 
@@ -213,6 +215,8 @@ onBeforeUnmount(() => {
 
 .back-button{ position:fixed; left:50%; transform:translateX(-50%); bottom:6vh; z-index:1400; background:rgba(255,255,255,0.12); color:#fff; padding:10px 18px; border-radius:8px; text-decoration:none; font-weight:700; box-shadow:0 8px 26px rgba(0,0,0,0.5) }
 .back-button:hover{ opacity:0.95 }
+
+.award-top{ position:fixed; top:64px; left:50%; transform:translateX(-50%); z-index:1600; font-size:50px; font-weight:800; color:#ffd57a; text-shadow:0 6px 18px rgba(0,0,0,0.6); letter-spacing:4px; font-family: 'BBH Bogle', sans-serif }
 
 /* side navigation buttons */
 .side-btn{ position:fixed; top:50%; transform:translateY(-50%); z-index:1400; width:56px; height:56px; border-radius:50%; border:0; display:flex; align-items:center; justify-content:center; font-size:34px; color:#fff; background:linear-gradient(180deg, rgba(255,255,255,0.06), rgba(0,0,0,0.18)); box-shadow:0 8px 26px rgba(0,0,0,0.45); cursor:pointer; backdrop-filter: blur(4px); }

@@ -2,9 +2,7 @@
   <div id="app">
     <NavBar v-if="!isAward" />
 
-    <div v-if="!isAward" class="award-button-wrap">
-      <router-link to="/award" class="award-button">어워드</router-link>
-    </div>
+    <!-- award button removed; navigation via main page FAB (.other-fab) -->
 
     <main :class="{ 'with-padding': !isHome && !isAward }">
       <router-view />
@@ -14,8 +12,8 @@
 
 <script>
 import NavBar from "./components/NavBar.vue";
-import { computed } from "vue";
-import { useRoute } from "vue-router";
+import { computed, onMounted, onBeforeUnmount } from "vue";
+import { useRoute, useRouter } from "vue-router";
 
 export default {
   name: "App",
@@ -24,8 +22,24 @@ export default {
   },
   setup() {
     const route = useRoute();
+    const router = useRouter();
     const isHome = computed(() => route.path === "/");
     const isAward = computed(() => route.path === "/award");
+
+    function handleDocClick(e) {
+      const target = e.target && e.target.closest && e.target.closest('.other-fab')
+      if (target) {
+        router.push('/award')
+      }
+    }
+
+    onMounted(() => {
+      document.addEventListener('click', handleDocClick)
+    })
+
+    onBeforeUnmount(() => {
+      document.removeEventListener('click', handleDocClick)
+    })
     return { isHome, isAward };
   },
 };
@@ -48,23 +62,5 @@ body {
   font-family: "Pretendard", "Noto Sans KR", sans-serif;
 }
 
-/* Award button styles */
-.award-button-wrap {
-  position: fixed;
-  top: 16px;
-  right: 16px;
-  z-index: 1200;
-}
-.award-button {
-  background: #e74c3c;
-  color: #fff;
-  padding: 8px 12px;
-  border-radius: 6px;
-  font-weight: 600;
-  text-decoration: none;
-  display: inline-block;
-}
-.award-button:hover {
-  opacity: 0.9;
-}
+/* Award button removed; styles cleaned */
 </style>
