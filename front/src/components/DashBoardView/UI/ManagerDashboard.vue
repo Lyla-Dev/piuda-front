@@ -52,6 +52,15 @@
           :result="statsData.accumAct"
           unit="번"
         />
+        
+        <button 
+          class="excel-download-btn"
+          @click="downloadExcel"
+          :disabled="loading"
+        >
+          <span class="excel-icon">📊</span>
+          원자료 엑셀 다운로드
+        </button>
       </div>
 
       <!-- 그래프 카드 -->
@@ -229,6 +238,36 @@ const handleReject = async (row) => {
   }
 };
 
+// 엑셀 다운로드
+const downloadExcel = async () => {
+  try {
+    const response = await http.get('/dashboard/admin/excel', {
+      responseType: 'blob'
+    });
+    
+    // 파일 다운로드 처리
+    const blob = new Blob([response.data], {
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    });
+    
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    
+    const today = new Date().toISOString().split('T')[0];
+    link.download = `관리자_대시보드_원자료_${today}.xlsx`;
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+    
+  } catch (error) {
+    console.error('엑셀 다운로드 실패:', error);
+    alert('엑셀 파일 다운로드에 실패했습니다.');
+  }
+};
+
 onMounted(() => {
   fetchDashboardData();
 });
@@ -249,10 +288,49 @@ onMounted(() => {
   align-items: flex-start;
 }
 
+.excel-download-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background-color: #10b981;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  margin-left: auto;
+  margin-top: 0;
+  height: fit-content;
+}
+
+.excel-download-btn:hover:not(:disabled) {
+  background-color: #059669;
+  transform: translateY(-1px);
+}
+
+.excel-download-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.excel-icon {
+  font-size: 16px;
+}
+
 @media (max-width: 1024px) {
   .stats-row {
     flex-direction: column;
     align-items: flex-start;
+  }
+  
+  .excel-download-btn {
+    width: 100%;
+    justify-content: center;
   }
 }
 
