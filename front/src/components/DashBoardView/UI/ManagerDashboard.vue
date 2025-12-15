@@ -200,12 +200,27 @@ const fetchDashboardData = async () => {
 
 // 제보 사진 보기
 const handleViewPhoto = (row) => {
+  console.log('📸 제보 사진 열기 시도:', {
+    reportId: row.reportId,
+    photoUrls: row.photoUrls,
+    firstUrl: row.photoUrls?.[0]
+  });
+  
   if (!row.photoUrls || row.photoUrls.length === 0) {
+    console.warn('⚠️ 제보 사진 없음:', row);
     alert('제보 사진이 없습니다.');
     return;
   }
   
-  window.open(row.photoUrls[0], '_blank');
+  const photoUrl = row.photoUrls[0];
+  console.log('✅ 사진 URL로 새 탭 열기:', photoUrl);
+  
+  try {
+    window.open(photoUrl, '_blank');
+  } catch (error) {
+    console.error('❌ 사진 열기 실패:', error);
+    alert('사진을 열 수 없습니다.');
+  }
 };
 
 // 제보 승인 (ACCEPT로 전송)
