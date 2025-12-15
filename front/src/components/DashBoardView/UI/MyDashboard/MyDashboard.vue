@@ -13,7 +13,7 @@
 
     <div v-else class="content-wrapper">
       <div class="dashboard-container">
-        <MyProfile :userName="dashboardData.userName" :startDate="dashboardData.user_created_at" />
+        <MyProfile :userName="dashboardData.userName" :startDate="formattedCreatedAt" />
         <ActivityGallery :reports="dashboardData.reports || []" />
       </div>
       <div class="chart-section">
@@ -24,7 +24,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import MyProfile from "@/components/DashBoardView/UI/MyDashboard/MyProfile.vue";
 import ActivityGallery from "@/components/DashBoardView/UI/MyDashboard/ActivityGallery.vue";
@@ -36,6 +36,15 @@ const loading = ref(true);
 const error = ref(null);
 const dashboardData = ref({});
 const monthlyData = ref([]);
+
+// createdAt을 YYYY-MM-DD 형식으로 변환
+const formattedCreatedAt = computed(() => {
+  const createdAt = dashboardData.value.createdAt;
+  if (!createdAt) return '';
+  
+  // "2025-12-15T06:50:23.730833" -> "2025-12-15"
+  return createdAt.split('T')[0];
+});
 
 const fetchDashboardData = async () => {
   try {
