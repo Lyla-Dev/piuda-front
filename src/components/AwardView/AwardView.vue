@@ -1,7 +1,8 @@
 <template>
   <div class="award-view">
+    <div class="leaf-bg" :style="{ backgroundImage: `url(${leaf})` }" aria-hidden="true"></div>
     <div class="decor">
-      <div class="title"><img src="@/assets/crown.png" alt="crown" class="crown-img"/> {{ titleText }} <img src="@/assets/crown.png" alt="crown" class="crown-img"/></div>
+      <div class="title"> {{ titleText }} </div>
       <div class="subtitle">{{ subtitleText }}</div>
       <img :src="currentImage" alt="award" class="center-image" />
       <div class="grouptitle"><strong>{{ groupTitleText }}</strong></div>
@@ -20,6 +21,7 @@
 import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
 import ssodam from '@/assets/ssodam.png'
 import badakeeper from '@/assets/BadaKeeper.png'
+import leaf from '@/assets/leaf.png'
 
 const fwCanvas = ref(null)
 
@@ -202,7 +204,7 @@ onBeforeUnmount(() => {
   text-shadow:0 6px 18px rgba(0,0,0,0.6);
   margin-bottom:6px;
 }
-.crown-img{ width:56px; height:auto; margin-right:10px; vertical-align:middle; transform:translateY(6px); display:inline-block }
+
 .subtitle{ font-size:14px; color:rgba(255,230,180,0.95); margin-bottom:22px; letter-spacing:2px }
 .grouptitle{ font-size:25px; color:rgba(255,230,180,0.95); margin-bottom:22px; letter-spacing:2px }
 .center-image{ max-width:38%; height:auto; object-fit:contain; filter:drop-shadow(0 12px 36px rgba(0,0,0,0.6)); border-radius:8px; background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.06)); padding:8px }
@@ -222,5 +224,8 @@ onBeforeUnmount(() => {
 
 /* Canvas fireworks styles */
 .fw-canvas{ position:absolute; inset:0; width:100%; height:100%; z-index:1250; pointer-events:none }
+
+/* leaf background */
+.leaf-bg{ position:absolute; z-index:1; pointer-events:none; inset:0; background-repeat:no-repeat; background-position:center 62%; background-size:42%; opacity:0.40; transform:translateZ(0) }
 
 </style>
