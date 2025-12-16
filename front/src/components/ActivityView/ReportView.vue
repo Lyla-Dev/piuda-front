@@ -14,6 +14,7 @@
       <p class="coords" v-if="isLocationLoading">📍 현재 위치를 가져오고 있습니다...</p>
       <p class="coords" v-else>📍 지도를 드래그하여 정확한 위치를 선택하세요</p>
       <p class="coords">좌표: ({{ coords.lng.toFixed(4) }}, {{ coords.lat.toFixed(4) }})</p>
+      <p class="coords" v-if="photoGpsStatus">{{ photoGpsStatus }}</p>
     </section>
 
     <!-- 사진 첨부 -->
@@ -22,7 +23,8 @@
 
       <div class="upload">
         <label class="dropzone" @dragover.prevent @drop.prevent="onDrop">
-          <input type="file" accept="image/png, image/jpeg" multiple class="file" @change="onFiles" />
+          <input ref="fileInput" type="file" accept="image/png, image/jpeg" multiple class="file" @change="onFiles"/>
+
           <div class="drop-content">
             <span class="icon">📷</span>
             <span>클릭하거나 이미지를 끌어다 놓으세요</span>
@@ -90,6 +92,7 @@ import { useRouter } from 'vue-router'
 import InputField from '@/components/common/InputField.vue'
 import TurnstileWidget from '@/components/common/TurnstileWidget.vue'
 import http from '@/api/http'
+import exifr from 'exifr'
 
 const router = useRouter()
 
@@ -101,6 +104,11 @@ const coords = ref({ lng: 126.9784, lat: 37.5666 }) // 서울 중심으로 초�
 const map = ref(null)
 const marker = ref(null)
 const isLocationLoading = ref(false)
+
+const fileInput = ref(null)
+const selectedFiles = ref([])     // 실제 업로드 파일들 저장
+const previews = ref([])
+const photoGpsStatus = ref('')    // "사진 위치 적용됨/없음" 메시지
 
 // Turnstile 관련
 const turnstileWidget = ref(null)
@@ -208,8 +216,6 @@ const initializeMap = () => {
   })
 }
 
-const previews = ref([])
-
 function onFiles(e) {
   loadPreviews([...e.target.files])
 }
@@ -219,13 +225,48 @@ function onDrop(e) {
   loadPreviews(files)
 }
 
-function loadPreviews(files) {
+async function loadPreviews(files) {
   previews.value = []
-  files.slice(0, 8).forEach(file => {
-    const url = URL.createObjectURL(file)
-    previews.value.push(url)
+  photoGpsStatus.value = ''
+
+  // 1) 파일 필터링(이미지 + 10MB 제한 + 최대 10장)
+  const filtered = files
+    .filter(f => /image\/(png|jpe?g)/.test(f.type))
+    .filter(f => f.size <= 10 * 1024 * 1024)
+    .slice(0, 10)
+
+  // 2) submit용 파일 저장
+  selectedFiles.value = filtered
+
+  // 3) 미리보기 생성
+  filtered.forEach(file => {
+    previews.value.push(URL.createObjectURL(file))
   })
+
+  // 4) 첫 번째 사진에서 GPS 읽어서 지도 이동
+  if (!filtered.length) return
+  try {
+    const gps = await exifr.gps(filtered[0]) // { latitude, longitude } 형태
+    if (gps?.latitude != null && gps?.longitude != null) {
+      coords.value.lat = gps.latitude
+      coords.value.lng = gps.longitude
+      photoGpsStatus.value = '🗺️ 사진 GPS 위치를 지도에 적용했습니다.'
+
+      // 지도가 이미 로드된 상태면 즉시 반영
+      if (map.value && window.naver?.maps) {
+        const pos = new window.naver.maps.LatLng(coords.value.lat, coords.value.lng)
+        map.value.setCenter(pos)
+        if (marker.value) marker.value.setPosition(pos)
+      }
+    } else {
+      photoGpsStatus.value = '❗ 이 사진에는 위치(GPS) 메타데이터가 없습니다. (지도에서 직접 선택해 주세요)❗'
+    }
+  } catch (e) {
+    console.warn('EXIF GPS 파싱 실패:', e)
+    photoGpsStatus.value = '⚠️ 사진 메타데이터를 읽지 못했습니다. (지도에서 직접 선택해 주세요)'
+  }
 }
+
 
 // Turnstile 이벤트 핸들러
 const onTurnstileToken = (token) => {
@@ -288,13 +329,12 @@ function submit() {
   )
 
   // 사진 파일들 추가 (photos 부분)
-  const fileInput = document.querySelector('input[type="file"]')
-  if (fileInput && fileInput.files) {
-    for (let i = 0; i < fileInput.files.length; i++) {
-      formData.append('photos', fileInput.files[i])
-    }
-  }
+  selectedFiles.value.forEach(f => formData.append('photos', f))
 
+  if (!selectedFiles.value.length) {
+    alert('사진을 첨부해주세요.')
+    return
+  }
   // 백엔드로 전송
   submitToBackend(formData)
 }
