@@ -165,6 +165,7 @@ import { useRouter } from 'vue-router'
 import InputField from '@/components/common/InputField.vue'
 import TurnstileWidget from '@/components/common/TurnstileWidget.vue'
 import http from '@/api/http'
+import exifr from 'exifr'
 
 const router = useRouter()
 
@@ -196,6 +197,33 @@ const turnstileSiteKey = process.env.VUE_APP_TURNSTILE_SITE_KEY
 
 // 네이버 지도 API 키
 const clientId = process.env.VUE_APP_NAVER_MAP_CLIENT_ID
+
+async function extractGpsFromFile(file) {
+  // JPG에 GPS가 있는 경우가 많고, PNG는 대부분 없음
+  try {
+    // gps 옵션을 주면 lat/lng를 편하게 받을 수 있습니다.
+    const gps = await exifr.gps(file) // { latitude, longitude } 또는 null
+    if (!gps || gps.latitude == null || gps.longitude == null) return null
+    return { lat: gps.latitude, lng: gps.longitude }
+  } catch (e) {
+    console.warn('EXIF GPS 파싱 실패:', e)
+    return null
+  }
+}
+
+function moveMapTo(lat, lng) {
+  coords.value.lat = lat
+  coords.value.lng = lng
+
+  if (map.value && window.naver?.maps) {
+    const center = new window.naver.maps.LatLng(lat, lng)
+    map.value.setCenter(center)
+    marker.value?.setPosition(center)
+    // 필요하면 zoom도 조정
+    // map.value.setZoom(15)
+  }
+}
+
 
 // 현재 위치 가져오기
 const getCurrentLocation = () => {
@@ -334,13 +362,31 @@ function onDrop(e) {
   const files = [...e.dataTransfer.files].filter(f => /image\/(png|jpe?g)/.test(f.type))
   loadPreviews(files)
 }
-function loadPreviews(files) {
+async function loadPreviews(files) {
   previews.value = []
-  files.slice(0, 8).forEach(file => {
+
+  const limited = files.slice(0, 8)
+
+  // 1) 프리뷰 생성
+  limited.forEach(file => {
     const url = URL.createObjectURL(file)
     previews.value.push(url)
   })
+
+  // 2) GPS가 들어있는 첫 번째 파일을 찾아 지도 이동
+  // (여러 장 올리면 “GPS 포함된 첫 사진” 기준으로 잡는 방식)
+  for (const file of limited) {
+    const gps = await extractGpsFromFile(file)
+    if (gps) {
+      moveMapTo(gps.lat, gps.lng)
+      return
+    }
+  }
+
+  // 3) 아무 사진에도 GPS가 없으면 안내(선택)
+  console.info('업로드한 이미지에서 GPS 메타데이터를 찾지 못했습니다.')
 }
+
 
 // Turnstile 이벤트 핸들러
 const onTurnstileToken = (token) => {

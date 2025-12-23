@@ -259,7 +259,7 @@ async function loadPreviews(files) {
         if (marker.value) marker.value.setPosition(pos)
       }
     } else {
-      photoGpsStatus.value = '❗ 이 사진에는 위치(GPS) 메타데이터가 없습니다. (지도에서 직접 선택해 주세요)❗'
+      photoGpsStatus.value = '❗이 사진에는 위치(GPS) 메타데이터가 없습니다. (지도에서 직접 선택해 주세요)❗'
     }
   } catch (e) {
     console.warn('EXIF GPS 파싱 실패:', e)
